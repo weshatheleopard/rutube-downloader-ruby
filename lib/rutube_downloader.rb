@@ -1,3 +1,4 @@
+require 'yaml'
 require 'net/sftp'
 require 'mechanize'
 
@@ -40,7 +41,9 @@ class RutubeDownloader
       agent.user_agent_alias = 'Windows IE 10' #'
     }
 
-    Net::SFTP.start($SFTP_SITE, $SFTP_USER, { :port => $SFTP_PORT, :password => $SFTP_PASSWORD, :non_interactive => true }) { |sftp|
+    Net::SFTP.start(config('SFTP_SITE'), config('SFTP_USER'),
+                     { :port => config('SFTP_PORT'), :password => config('SFTP_PASSWORD'),
+                       :non_interactive => true }) { |sftp|
       url =~ /\/([a-z0-9]+)\.mp4\/segment-(\d+)-/
       re = Regexp.new("segment-#{$2}-")
       prefix = $1
@@ -72,7 +75,7 @@ class RutubeDownloader
   end
 
   def gen_bat(arr, url)
-    cmd = "#{FFMPEG_PATH} -i \"concat:#{arr.join('|')}\" -c copy !out.mp4"
+    cmd = "#{config('FFMPEG_PATH')} -i \"concat:#{arr.join('|')}\" -c copy !out.mp4"
 
     Tempfile.create { |f|
       f.puts cmd ; f.puts "rem #{url}"
@@ -80,6 +83,11 @@ class RutubeDownloader
       f.rewind
       yield(f.path)
     }
+  end
+
+  def config(k)
+    @config ||= YAML.load(File.read("config.yml"))
+    @config[k]
   end
 end
 
