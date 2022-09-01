@@ -1,0 +1,89 @@
+require 'net/sftp'
+require 'mechanize'
+
+class RutubeDownloader
+  def find_last(re, url, end_number = 1000)
+    good = mid = nil
+    start_number = 1
+
+    print "Detecting length... \033[s"
+
+    100.times do
+      mid = (start_number + end_number) / 2
+
+      print "\033[u#{mid}"
+
+      if test_number(re, url, mid) then
+        start_number = mid
+      else
+        end_number = mid
+      end
+
+      break if start_number + 1 == end_number
+    end
+
+    puts "\033[u#{start_number}"
+    return start_number
+  end
+
+  def test_number(re, url, n)
+    begin
+      @agent.head(url.gsub(re, "segment-#{n}-"))
+      return true
+    rescue Mechanize::ResponseCodeError
+      return false
+    end
+  end
+
+  def download_video(url, start = 1, endno = nil)
+    @agent = Mechanize.new { |agent|
+      agent.user_agent_alias = 'Windows IE 10' #'
+    }
+
+    Net::SFTP.start($SFTP_SITE, $SFTP_USER, { :port => $SFTP_PORT, :password => $SFTP_PASSWORD, :non_interactive => true }) { |sftp|
+      url =~ /\/([a-z0-9]+)\.mp4\/segment-(\d+)-/
+      re = Regexp.new("segment-#{$2}-")
+      prefix = $1
+
+      sftp.mkdir prefix
+      endno ||= find_last(re, url)
+
+      arr = []
+
+      print "\033[s"
+
+      start.upto(endno) do |i|
+        newurl = url.gsub(re, "segment-#{i}-")
+        p = @agent.get(newurl)
+
+        print "\033[u#{i}/#{endno}"
+
+        fn = "%s-%03d.ts" % [ prefix[-5..-1], i ]
+        p.save_as(fn)
+        sftp.upload!(fn, "#{prefix}/#{fn}")
+        File.delete(fn)
+
+        arr << fn
+      end
+      puts
+
+      gen_bat(arr, url) { |filepath| sftp.upload!(filepath, "#{prefix}/_#{prefix}.bat" ) }
+    }
+  end
+
+  def gen_bat(arr, url)
+    cmd = "#{FFMPEG_PATH} -i \"concat:#{arr.join('|')}\" -c copy !out.mp4"
+
+    Tempfile.create { |f|
+      f.puts cmd ; f.puts "rem #{url}"
+      f.flush
+      f.rewind
+      yield(f.path)
+    }
+  end
+end
+
+def dl(*args)
+  n = RutubeDownloader.new
+  n.download_video(*args)
+end

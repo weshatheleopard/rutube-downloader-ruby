@@ -1,0 +1,52 @@
+GIT
+  remote: https://github.com/eligoenergy/mechanize.git
+  revision: e5d2af3623e0f3432963d6d0bbf90956414d2f9e
+  specs:
+    mechanize (2.7.6)
+      domain_name (~> 0.5, >= 0.5.1)
+      http-cookie (~> 1.0)
+      mime-types (>= 1.17.2)
+      net-http-digest_auth (~> 1.1, >= 1.1.1)
+      net-http-persistent (>= 2.5.2)
+      nokogiri (~> 1.6)
+      ntlm-http (~> 0.1, >= 0.1.1)
+      webrobots (>= 0.0.9, < 0.2)
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    connection_pool (2.2.5)
+    domain_name (0.5.20190701)
+      unf (>= 0.0.5, < 1.0.0)
+    http-cookie (1.0.4)
+      domain_name (~> 0.5)
+    mime-types (3.4.1)
+      mime-types-data (~> 3.2015)
+    mime-types-data (3.2022.0105)
+    net-http-digest_auth (1.4.1)
+    net-http-persistent (4.0.1)
+      connection_pool (~> 2.2)
+    net-sftp (3.0.0)
+      net-ssh (>= 5.0.0, < 7.0.0)
+    net-ssh (6.1.0)
+    nokogiri (1.13.3-x86_64-linux)
+      racc (~> 1.4)
+    ntlm-http (0.1.1)
+    racc (1.6.0)
+    unf (0.1.4)
+      unf_ext
+    unf_ext (0.0.8.1)
+    webrobots (0.1.2)
+
+PLATFORMS
+  x86_64-linux
+
+DEPENDENCIES
+  mechanize!
+  net-sftp
+
+RUBY VERSION
+   ruby 2.7.5p203
+
+BUNDLED WITH
+   2.3.5
