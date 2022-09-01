@@ -3,7 +3,7 @@ require 'mechanize'
 
 class RutubeDownloader
   def find_last(re, url, end_number = 1000)
-    good = mid = nil
+    mid = nil
     start_number = 1
 
     print "Detecting length... \033[s"
