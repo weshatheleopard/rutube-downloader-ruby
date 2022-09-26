@@ -9,9 +9,3 @@ class ZvezdaDownloader < VideoDownloader
     /\/([a-z0-9]+)\.mp4\/.+\/segment(\d+)/
   end
 end
-
-def dlz(*args)
-  n = ZvezdaDownloader.new
-  n.download_video(*args)
-end
-
