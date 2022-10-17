@@ -5,6 +5,8 @@ def dl(*args)
       RutubeDownloader
     when /tvzvezda\.ru/ then
       ZvezdaDownloader
+    when /cloudfront/ then
+      TwitchDownloader
     end
 
   n.new.download_video(*args)

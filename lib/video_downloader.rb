@@ -3,7 +3,7 @@ require 'net/sftp'
 require 'mechanize'
 
 class VideoDownloader
-  def find_last(re, url, end_number = 1000)
+  def find_last(re, url, end_number = max_num)
     mid = nil
     start_number = 1
 
@@ -32,8 +32,10 @@ class VideoDownloader
       @agent.head(url.gsub(re, segment_name(n)))
       return true
     rescue Mechanize::ResponseCodeError => e
-      return false if e.response_code == '404'
-      retry
+      case e.response_code
+      when '403', '404' then return false
+      else retry
+      end
     end
   end
 
@@ -74,7 +76,7 @@ class VideoDownloader
 
         print "\033[u#{i}/#{endno}\033[0K"
 
-        fn = "%s-%03d.ts" % [ prefix[-5..-1], i ]
+        fn = "%s-%04d.ts" % [ prefix[-3..-1], i ]
         p.save_as(fn)
         sftp.upload!(fn, "#{prefix}/#{fn}")
         File.delete(fn)
