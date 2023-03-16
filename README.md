@@ -3,9 +3,11 @@
 Download video files from the sites that generally don't want you to download videos from.
 
 Currently supported:
-  * Twitch
-  * RuTube
-  * Zvezda
+  * [Twitch](https://www.twitch.tv/)
+  * [RuTube](https://rutube.ru/)
+  * [TV Zvezda](https://tvzvezda.ru/)
+  
+Others can be added too through respective subclasses
   
 How:
 1) Start watching the desired video
