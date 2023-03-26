@@ -2,6 +2,14 @@ require 'yaml'
 require 'net/sftp'
 require 'mechanize'
 
+# Subclasses should definitely overload:
+# * +segment_regexp+
+#   - Regexp that matches the source URL, returning 1st capture section that contains the video identifier,
+#     (used, in particular, to name the download directory), and 2nd capture section that contains the
+#     name of the specific segment
+#     TODO: make these parameters named instead of numbered.
+# * +segment_name(n)+ - String, containing the exact name of segment number `n`.
+
 class VideoDownloader
   def find_last(re, url, end_number = max_num)
     mid = nil
@@ -29,8 +37,13 @@ class VideoDownloader
 
   def test_number(re, url, n)
     begin
-      @agent.head(url.gsub(re, segment_name(n)))
+
+      test_url = url.gsub(re, segment_name(n))
+      @agent.read_timeout = 5
+      @agent.head(test_url)
       return true
+    rescue Net::ReadTimeout
+      return false
     rescue Mechanize::ResponseCodeError => e
       case e.response_code
       when '403', '404' then return false
@@ -39,7 +52,7 @@ class VideoDownloader
     end
   end
 
-  def download_video(url, start = 1, endno = nil)
+  def download_video(url, start: 1, endno: nil)
     @agent = Mechanize.new { |agent|
       agent.user_agent_alias = 'Windows IE 10' #'
     }

@@ -7,6 +7,8 @@ def dl(*args)
       ZvezdaDownloader
     when /cloudfront/ then
       TwitchDownloader
+    when /foxnews/ then
+      FoxnewsDownloader
     end
 
   n.new.download_video(*args)
