@@ -11,11 +11,23 @@ require 'mechanize'
 # * +segment_name(n)+ - String, containing the exact name of segment number `n`.
 
 class VideoDownloader
-  def find_last(re, url, end_number = max_num)
+  def find_last(re, url)
     mid = nil
-    start_number = 1
+    end_number = start_number = 1
 
     print "Detecting length... \033[s"
+
+    # Perform binary search up to find a number betond the end of the stream
+
+    100.times do
+      end_number = end_number * 2
+
+      print "\033[u#{end_number}"
+
+      break if !test_number(re, url, end_number)
+    end
+
+    # Perform binary search down up to the actual end of the stream
 
     100.times do
       mid = (start_number + end_number) / 2
