@@ -110,15 +110,26 @@ class VideoDownloader
       end
       puts
 
-      gen_bat(arr, url) { |filepath| sftp.upload!(filepath, "#{prefix}/_#{prefix}.bat" ) }
+      generate_segment_list(arr, url) { |filepath| sftp.upload!(filepath, "#{prefix}/_list.txt" ) }
+      generate_batch_file(arr, url) { |filepath| sftp.upload!(filepath, "#{prefix}/_#{prefix}.bat" ) }
     }
   end
 
-  def gen_bat(arr, url)
-    cmd = "#{config('FFMPEG_PATH')} -i \"concat:#{arr.join('|')}\" -c copy !out.mp4"
-
+  def generate_segment_list(arr, url)
     Tempfile.create { |f|
-      f.puts cmd ; f.puts "rem #{url}"
+      f.puts "# Segment list from #{url}"
+      arr.each { |fn| f.puts "file '#{fn}'" }
+      f.flush
+      f.rewind
+      yield(f.path)
+    }
+  end
+
+  def generate_batch_file(arr, url)
+    cmd = "#{config('FFMPEG_PATH')} -f concat -safe 0 -i _list.txt -c copy !out.mp4"
+    Tempfile.create { |f|
+      f.puts "rem #{url}"
+      f.puts cmd
       f.flush
       f.rewind
       yield(f.path)
