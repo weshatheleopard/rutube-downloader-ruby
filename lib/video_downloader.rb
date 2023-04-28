@@ -17,7 +17,7 @@ class VideoDownloader
 
     print "Detecting length... \033[s"
 
-    # Perform binary search up to find a number betond the end of the stream
+    # Perform binary search up to find a number beyond the end of the stream
 
     100.times do
       end_number = end_number * 2
@@ -32,7 +32,7 @@ class VideoDownloader
     100.times do
       mid = (start_number + end_number) / 2
 
-      print "\033[u#{mid}"
+      print "\033[u#{mid}   "
 
       if test_number(re, url, mid) then
         start_number = mid
