@@ -1,0 +1,9 @@
+#!/usr/bin/env ruby
+
+# Load bundle gems
+require 'bundler'
+Bundler.require
+
+require_relative 'lib/main.rb'
+
+dl ARGV[0]

@@ -1,4 +1,4 @@
-require 'video_downloader'
+require_relative 'video_downloader'
 
 class TwitchDownloader < VideoDownloader
   def segment_name(n)
