@@ -11,6 +11,10 @@ require 'mechanize'
 # * +segment_name(n)+ - String, containing the exact name of segment number `n`.
 
 class VideoDownloader
+  def self.can_download?(url)
+    false
+  end
+
   def find_last(re, url)
     mid = nil
     end_number = start_number = 1
@@ -52,7 +56,7 @@ class VideoDownloader
 
       test_url = url.gsub(re, segment_name(n))
       @agent.read_timeout = 5
-      @agent.head(test_url)
+      @agent.head(test_url).instance_of?(Mechanize::File)
       return true
     rescue Net::ReadTimeout
       return false

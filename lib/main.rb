@@ -1,13 +1,12 @@
 Dir['lib/*_downloader.rb'].each { |fn| require(File.expand_path(fn)) }
 
 def dl(*args)
-  n =
-    case args[0]
-    when /rutube\.ru/   then RutubeDownloader
-    when /tvzvezda\.ru/ then ZvezdaDownloader
-    when /cloudfront/   then TwitchDownloader
-    when /foxnews/      then FoxnewsDownloader
+  ObjectSpace.each_object(VideoDownloader::singleton_class) do |klass|
+    if klass.can_download?(args[0]) then
+      klass.new.download_video(*args)
+      exit
     end
+  end
 
-  n.new.download_video(*args)
+  puts "#{args[0]} did not match any known downloaders"
 end

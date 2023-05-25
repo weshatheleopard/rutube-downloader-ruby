@@ -1,15 +1,15 @@
 require_relative 'video_downloader'
 
-class ZvezdaDownloader < VideoDownloader
+class RamblerDownloader < VideoDownloader
   def self.can_download?(url)
-    url =~ /tvzvezda\.ru/i
+    url =~ /rambler/i
   end
 
   def segment_name(n)
-    "segment#{n}"
+    "seg-#{n}-"
   end
 
   def segment_regexp
-    /\/([a-z0-9]+)\.mp4\/.+\/segment(\d+)/
+    /\/([a-zA-Z0-9]+)\.mp4\/seg-(\d+)-/
   end
 end
