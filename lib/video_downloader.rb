@@ -57,8 +57,7 @@ class VideoDownloader
 
       test_url = url.gsub(re, segment_name(n))
       @agent.read_timeout = 5
-      @agent.head(test_url).instance_of?(Mechanize::File)
-      return true
+      return @agent.head(test_url).instance_of?(Mechanize::File)
     rescue Net::ReadTimeout
       return false
     rescue Mechanize::ResponseCodeError => e
