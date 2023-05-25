@@ -9,6 +9,7 @@ require 'mechanize'
 #     name of the specific segment
 #     TODO: make these parameters named instead of numbered.
 # * +segment_name(n)+ - String, containing the exact name of segment number `n`.
+# * +can_download(url)+ - Boolean, true if the subclass claims that it can properly download +url+.
 
 class VideoDownloader
   def self.can_download?(url)

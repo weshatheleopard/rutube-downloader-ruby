@@ -7,6 +7,7 @@ Currently supported:
   * [RuTube](https://rutube.ru/)
   * [TV Zvezda](https://tvzvezda.ru/)
   * [Fox News](https://www.foxnews.com)
+  * [Rambler News](https://news.rambler.ru/video/)
   
 Others can be added too through respective subclasses
   
