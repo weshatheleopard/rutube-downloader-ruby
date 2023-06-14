@@ -10,6 +10,6 @@ class ZvezdaDownloader < VideoDownloader
   end
 
   def segment_regexp
-    /\/([a-z0-9]+)\.mp4\/.+\/segment(\d+)/
+    /\/([A-Za-z0-9]+)\.mp4\/.+\/segment(\d+)/
   end
 end
