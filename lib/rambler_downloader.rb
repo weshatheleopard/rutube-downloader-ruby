@@ -10,6 +10,6 @@ class RamblerDownloader < VideoDownloader
   end
 
   def segment_regexp
-    /\/([a-zA-Z0-9]+)\.mp4\/seg-(\d+)-/
+    /\/(?<prefix>[a-zA-Z0-9]+)\.mp4\/seg-(?<number>\d+)-/
   end
 end

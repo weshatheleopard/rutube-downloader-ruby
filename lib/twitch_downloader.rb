@@ -10,6 +10,6 @@ class TwitchDownloader < VideoDownloader
   end
 
   def segment_regexp
-    /\/([0-9a-z_]+)\/chunked\/(\d+).ts$/
+    /\/(?<prefix>[0-9a-z_]+)\/chunked\/(?<number>\d+).ts$/
   end
 end

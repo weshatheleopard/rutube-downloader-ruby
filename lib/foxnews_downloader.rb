@@ -10,6 +10,6 @@ class FoxnewsDownloader < VideoDownloader
   end
 
   def segment_regexp
-    /\/clear\/(\d+)\/.+\/segment(\d+)\.ts/
+    /\/clear\/(?<prefix>\d+)\/.+\/segment(?<number>\d+)\.ts/
   end
 end
