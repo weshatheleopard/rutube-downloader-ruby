@@ -25,6 +25,6 @@ Others can be added too through respective subclasses
 
 The code will automatically detect the total number of segments in the video and download them all. It will also create the Windows BAT file for `ffmpeg` to join all these segments into a single video file.
 
-Named parameters (console only):
+#### Named parameters (console only):
   * `start` - start downloading with this segment number
   * `endno` - finish downloading with this segment number (otherwise perform automatic detection)
