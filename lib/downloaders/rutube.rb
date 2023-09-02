@@ -1,5 +1,3 @@
-require_relative 'video_downloader'
-
 class RutubeDownloader < VideoDownloader
   def self.can_download?(url)
     url =~ /rutube\.ru/i

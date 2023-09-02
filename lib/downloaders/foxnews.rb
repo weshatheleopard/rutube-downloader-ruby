@@ -1,5 +1,3 @@
-require_relative 'video_downloader'
-
 class FoxnewsDownloader < VideoDownloader
   def self.can_download?(url)
     url =~ /foxnews/i

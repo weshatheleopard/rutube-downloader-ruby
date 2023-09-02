@@ -1,5 +1,3 @@
-require_relative 'video_downloader'
-
 class TwitchDownloader < VideoDownloader
   def self.can_download?(url)
     url =~ /cloudfront/i

@@ -1,5 +1,3 @@
-require_relative 'video_downloader'
-
 class ZvezdaDownloader < VideoDownloader
   def self.can_download?(url)
     url =~ /tvzvezda\.ru/i

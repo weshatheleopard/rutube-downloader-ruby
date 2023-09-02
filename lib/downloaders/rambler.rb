@@ -1,5 +1,3 @@
-require_relative 'video_downloader'
-
 class RamblerDownloader < VideoDownloader
   def self.can_download?(url)
     url =~ /rambler/i
