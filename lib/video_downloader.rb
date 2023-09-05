@@ -45,6 +45,8 @@ class VideoDownloader
     puts "\033[udone.    "
 
     upload segments, prefix, url
+
+    true
   end
 
   # RETURNS: `true` if there are further segments
