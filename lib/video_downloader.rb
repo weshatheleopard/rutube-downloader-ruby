@@ -11,11 +11,13 @@ require 'mechanize'
 # * +can_download(url)+ - Boolean, true if the subclass claims that it can properly download +url+.
 
 class VideoDownloader
+  TMPDIR = '/tmp'
+
   def self.can_download?(url)
     false
   end
 
-  def download_video(url, start: 1, endno: nil)
+  def download_video(url, start: 1, endno: nil, combine: false)
     @agent = Mechanize.new { |agent|
       agent.user_agent_alias = 'Windows IE 10' #'
       agent.read_timeout = 5
@@ -42,11 +44,31 @@ class VideoDownloader
         break
       end
     end
-    puts "\033[udone.    "
+    puts "\033[udone."
 
-    upload segments, prefix, url
+    if combine then
+      upload combine(segments, prefix), prefix, url
+    else
+      upload segments, prefix, url
+    end
 
     true
+  end
+
+  def in_tmp_dir(file_name)
+    Pathname.new(TMPDIR).join(file_name).to_s
+  end
+
+  def combine(segments, prefix)
+    ffmpeg = `which ffmpeg`
+    raise "FFMPEG binary not found" if ffmpeg.empty?
+
+    outfilename = in_tmp_dir("_#{prefix}.mp4")
+    segment_list_file = generate_segment_list(in_tmp_dir('_list.txt'), segments, prefix)
+    `ffmpeg -f concat -safe 0 -i #{segment_list_file} -c copy #{outfilename}`
+    File.delete(segment_list_file)
+
+    [ outfilename ]
   end
 
   # RETURNS: `true` if there are further segments
@@ -64,10 +86,9 @@ class VideoDownloader
       end
     end
 
-    fn = "%s-%04d.ts" % [ prefix[-3..-1], n ]
-    newfile.save_as(fn)
-
-    return fn
+    full_path = in_tmp_dir("%s-%04d.ts" % [ prefix[-3..-1], n ])
+    newfile.save_as(full_path)
+    return full_path
   end
 
   def upload(files, prefix, source_url)
@@ -76,40 +97,39 @@ class VideoDownloader
                        :non_interactive => true }) { |sftp|
       sftp.mkdir prefix
 
+      if files.size > 1 then
+        files << generate_segment_list(in_tmp_dir('_list.txt'), files, source_url)
+        files << generate_batch_file(in_tmp_dir("_#{prefix}.bat"), files, source_url, prefix)
+      end
+
       print "Uploading... \033[s"
 
       files.each do |fn|
-        sftp.upload!(fn, "#{prefix}/#{fn}")
+        sftp.upload!(fn, "#{prefix}/#{File.basename(fn)}")
         File.delete(fn)
         print "\033[u#{fn}"
       end
 
-      puts "\033[udone.           "
-
-      generate_segment_list(files, source_url) { |filepath| sftp.upload!(filepath, "#{prefix}/_list.txt" ) }
-      generate_batch_file(files, source_url) { |filepath| sftp.upload!(filepath, "#{prefix}/_#{prefix}.bat" ) }
+      puts "\033[udone.\033[K"
     }
   end
 
-  def generate_segment_list(arr, source_url)
-    Tempfile.create { |f|
+  def generate_segment_list(list_path, arr, source_url)
+    File.open(list_path, "w") { |f|
       f.puts "# Segment list from #{source_url}"
-      arr.each { |fn| f.puts "file '#{fn}'" }
-      f.flush
-      f.rewind
-      yield(f.path)
+      arr.each { |fn| f.puts "file '#{File.basename(fn)}'" }
     }
+
+    list_path
   end
 
-  def generate_batch_file(arr, source_url)
-    cmd = "#{config('FFMPEG_PATH')} -f concat -safe 0 -i _list.txt -c copy !out.mp4"
-    Tempfile.create { |f|
+  def generate_batch_file(bat_path, arr, source_url, prefix)
+    File.open(bat_path, "w") { |f|
       f.puts "rem #{source_url}"
-      f.puts cmd
-      f.flush
-      f.rewind
-      yield(f.path)
+      f.puts "#{config('FFMPEG_PATH')} -f concat -safe 0 -i _list.txt -c copy _#{prefix}.mp4"
     }
+
+    bat_path
   end
 
   def config(k)

@@ -28,3 +28,13 @@ The code will automatically detect the total number of segments in the video and
 #### Named parameters (console only):
   * `start` - start downloading with this segment number
   * `endno` - finish downloading with this segment number (otherwise perform automatic detection)
+
+## File assembly
+
+Result file can now be assembled from chunks on the system doing the downloading. In that case, `ffmpeg` has to be installed on that system:
+
+  `sudo apt-get install ffmpeg`
+
+In that case, only the final file will be uploaded. This is controlled by the `combine:` named parameter of the call to `dl` in console.
+
+Temporary files are now stored in `/tmp` and deleted upon successful uploading.
