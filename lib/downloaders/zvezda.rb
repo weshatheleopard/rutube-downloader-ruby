@@ -3,49 +3,19 @@ class ZvezdaDownloader < VideoDownloader
     url =~ /tvzvezda\.ru/i
   end
 
-  def download_video(url, combine: false)
-    segments = []
+  # For downloading by video URL
 
-    @agent = Mechanize.new { |agent|
-      agent.user_agent_alias = 'Windows IE 10' #'
-      agent.read_timeout = 5
-    }
-
-    prefix, urls = get_track_list(url)
-
-    print "Downloading... \033[s"
-
-    urls.each { |url|
-      print "\033[u#{url}"
-      segments << get_segment(url, prefix)
-    }
-    puts "\033[udone."
-
-    if combine then
-      upload combine(segments, prefix), prefix, url
-    else
-      upload segments, prefix, url
-    end
-
-    true
+  def segment_name(n)
+    "segment#{n}"
   end
 
-  def get_segment(url, prefix)
-    begin
-      newfile = @agent.get(url)
-    rescue Net::ReadTimeout
-      retry
-    rescue Mechanize::ResponseCodeError => e
-      case e.response_code
-      when '403', '404' then return false
-      else retry
-      end
-    end
-
-    full_path = in_tmp_dir(newfile.filename)
-    newfile.save_as(full_path)
-    return full_path
+  def segment_regexp
+    /\/(?<prefix>[A-Za-z0-9_]+)\.mp4\/.+\/segment(?<number>\d+)/
   end
+
+  # For automatic dowloading by video page URL
+
+  AGENT_ALIAS = 'Windows IE 10' #'
 
   def get_track_list(url)
     page = @agent.get(url)

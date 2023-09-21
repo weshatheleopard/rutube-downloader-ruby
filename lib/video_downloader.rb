@@ -136,4 +136,49 @@ class VideoDownloader
     @config ||= YAML.load(File.read("config.yml"))
     @config[k]
   end
+
+  def get_segment_by_url(url, prefix)
+    begin
+      newfile = @agent.get(url)
+    rescue Net::ReadTimeout
+      retry
+    rescue Mechanize::ResponseCodeError => e
+      case e.response_code
+      when '403', '404' then return false
+      else retry
+      end
+    end
+
+    full_path = in_tmp_dir(newfile.filename)
+    newfile.save_as(full_path)
+    return full_path
+  end
+
+  def download_video_by_url(url, combine: false)
+    segments = []
+
+    @agent = Mechanize.new { |agent|
+      agent.user_agent_alias = self.class.const_get(:AGENT_ALIAS)
+      agent.read_timeout = 5
+    }
+
+    prefix, urls = get_track_list(url)
+
+    print "Downloading... \033[s"
+
+    urls.each { |url|
+      print "\033[u#{url}"
+      segments << get_segment_by_url(url, prefix)
+    }
+    puts "\033[udone."
+
+    if combine then
+      upload combine(segments, prefix), prefix, url
+    else
+      upload segments, prefix, url
+    end
+
+    true
+  end
+
 end
