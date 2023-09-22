@@ -1,6 +1,7 @@
 class FoxnewsDownloader < VideoDownloader
   def self.can_download?(url)
-    url =~ /foxnews/i
+    return :stream if url =~ /foxnews/i
+    false
   end
 
   def segment_name(n)

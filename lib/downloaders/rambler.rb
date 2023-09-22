@@ -1,6 +1,7 @@
 class RamblerDownloader < VideoDownloader
   def self.can_download?(url)
-    url =~ /rambler/i
+    return :stream if url =~ /rambler/i
+    false
   end
 
   def segment_name(n)

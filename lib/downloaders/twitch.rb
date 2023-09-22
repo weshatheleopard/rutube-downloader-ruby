@@ -1,6 +1,7 @@
 class TwitchDownloader < VideoDownloader
   def self.can_download?(url)
-    url =~ /cloudfront/i
+    return :stream if url =~ /cloudfront/i
+    false
   end
 
   def segment_name(n)

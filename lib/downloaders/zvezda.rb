@@ -1,6 +1,8 @@
 class ZvezdaDownloader < VideoDownloader
   def self.can_download?(url)
-    url =~ /tvzvezda\.ru/i
+    return :stream if url =~ /cdn\.tvzvezda\.ru\/storage.+\.ts/i
+    return :page if url =~ /tvzvezda\.ru\/(.+)\.html/i
+    false
   end
 
   # For downloading by video URL
@@ -35,5 +37,4 @@ class ZvezdaDownloader < VideoDownloader
 
     [ base_url[-10..-1], matches.map { |track| "#{base_url}/#{selection}/#{track[0]}" } ]
   end
-
 end

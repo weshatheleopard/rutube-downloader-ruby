@@ -2,7 +2,9 @@ require 'json'
 
 class RutubeDownloader < VideoDownloader
   def self.can_download?(url)
-    url =~ /rutube\.ru/i
+    return :stream if url =~ /rutube\.ru\/.+\.ts/i
+    return :page if url =~ /rutube\.ru\/video\//i
+    false
   end
 
   # For downloading by video URL
@@ -37,5 +39,4 @@ class RutubeDownloader < VideoDownloader
 
     [ video_id, matches.map { |track| URI(track_list_url).merge(track.first).to_s } ]
   end
-
 end

@@ -3,17 +3,19 @@ require_relative 'video_downloader.rb'
 Dir['lib/downloaders/*.rb'].each { |fn| require(File.expand_path(fn)) }
 
 def dl(*args)
+  download_type = nil
+
   downloder_class = ObjectSpace.each_object(VideoDownloader::singleton_class).find do |klass|
-    klass.can_download?(args[0])
+    download_type = klass.can_download?(args[0])
   end
 
-  downloder_class&.new&.download_video(*args) || puts("#{args[0]} did not match any known downloaders")
-end
+  puts("#{args[0]} did not match any known downloaders") unless downloder_class
 
-def dl2(*args)
-  downloder_class = ObjectSpace.each_object(VideoDownloader::singleton_class).find do |klass|
-    klass.can_download?(args[0])
+  case download_type
+  when :page then
+     downloder_class&.new&.download_video_by_url(*args)
+  else # stream
+     downloder_class&.new&.download_video(*args)
   end
 
-  downloder_class&.new&.download_video_by_url(*args) || puts("#{args[0]} did not match any known downloaders")
 end
