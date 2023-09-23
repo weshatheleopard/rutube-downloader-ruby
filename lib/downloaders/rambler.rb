@@ -1,5 +1,6 @@
 class RamblerDownloader < VideoDownloader
   def self.can_download?(url)
+    return :page if url =~ /(^.+rambler\.ru\/[^\/]+\/(\d+)-)/
     return :stream if url =~ /rambler/i
     false
   end
@@ -10,5 +11,34 @@ class RamblerDownloader < VideoDownloader
 
   def segment_regexp
     /\/(?<prefix>[a-zA-Z0-9]+)\.mp4\/seg-(?<number>\d+)-/
+  end
+
+  # For automatic dowloading by video page URL
+
+  AGENT_ALIAS = 'Windows IE 10' #'
+
+  def get_track_list(url)
+    uri = URI(url)
+    uri.query = nil
+    page = @agent.get(uri)
+
+    md = page.content.scan(/"recordId":"(\d+)"/)
+    video_id =  md[1].first # Need to make sure this is always the correct one
+
+    page = @agent.get('https://api.vp.rambler.ru/api/v3/records/getPlayerData', params: { id: video_id }.to_json )
+    json = JSON.parse(page.content)
+
+    res_selection_url = json['result']['playList']['source']
+    res_selection_list = @agent.get(res_selection_url).content
+
+    md = res_selection_list.scan(/(\#EXT-X-STREAM-INF:(?<inf>[^\n]+)\n(?<url>[^\n]+))/ix)
+
+    # Pick the best resolution from the list. In this particular downloader, looks like best is the first one
+    track_list_url = md[0][1]
+    track_list = @agent.get(track_list_url).content
+
+    matches = track_list.scan(/(\#EXTINF:(?<inf>[^\n]+)\n(?<url>[^\n]+))/ix)
+
+    [ video_id, matches.map { |track| URI(track_list_url).merge(track.last).to_s } ]
   end
 end
