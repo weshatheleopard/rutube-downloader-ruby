@@ -4,20 +4,33 @@ Download video files from the sites that generally don't want you to download vi
 
 Currently supported:
   * [Twitch](https://www.twitch.tv/)
-  * [RuTube](https://rutube.ru/)
-  * [TV Zvezda](https://tvzvezda.ru/)
+  * [RuTube](https://rutube.ru/) (NEW)
+  * [TV Zvezda](https://tvzvezda.ru/) (NEW)
   * [Fox News](https://www.foxnews.com)
-  * [Rambler News](https://news.rambler.ru/video/)
+  * [Rambler News](https://news.rambler.ru/video/) (NEW)
   
 Others can be added too through respective subclasses
   
 ## How to use:
+Some downloaders have been moved to support both video file URL and main video page URL, which makes downloading more user-friendly. Old method still works, but it is not available for ALL supported downloaders yet.
+
+### NEW mehod
+
+#### Option 1 (shell):
+1. In the system shell, execute `dl` script with the URL of the webpage where video is located (`./dl http://video.site/breaking-news-654321`)
+
+#### Option 2 (Ruby console):
+1. Launch the console of this project (`rake console`)
+2. Launch the code with the URL obtained at the step above (`dl 'http://video.site/breaking-news-654321'`)
+
+### OLD method (still works!)
+
 1. Start watching the desired video
 2. Using Firefox's Developer Tools (invoked by F12), in the Network tab, set filter to "Media". Watch the .ts files being downloaded.
 3. Copy the URL of any of such file
 
 #### Option 1 (shell):
-4. In the system  shell, execute `dl` script with the URL obtained at the step above (`./dl http://......long_video_file_url......`)
+4. In the system shell, execute `dl` script with the URL obtained at the step above (`./dl http://......long_video_file_url......`)
 
 #### Option 2 (Ruby console):
 4. Launch the console of this project (`rake console`)

@@ -22,8 +22,10 @@ class RamblerDownloader < VideoDownloader
     uri.query = nil
     page = @agent.get(uri)
 
-    md = page.content.scan(/"recordId":"(\d+)"/)
-    video_id =  md[1].first # Need to make sure this is always the correct one
+    json_str = page.content.match(/<script>window.__PRELOADED_STATE__=(.+?)<\/script>/)[1]
+    json = JSON.parse(json_str.gsub(/new Date\("[^"]+"\)/, '""'))
+    entries = json.dig('commonData','entries','entities')
+    video_id = entries.collect { |e| e.dig(1, 'video', 'recordId') }.delete_if(&:empty?).first
 
     page = @agent.get('https://api.vp.rambler.ru/api/v3/records/getPlayerData', params: { id: video_id }.to_json )
     json = JSON.parse(page.content)
