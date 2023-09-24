@@ -12,6 +12,9 @@ require 'mechanize'
 
 class VideoDownloader
   TMPDIR = '/tmp'
+  SAVE_POS = "\033[s"
+  RESTORE_POS = "\033[u"
+  ERASE_TO_EOL = "\033[K"
 
   def self.can_download?(url)
     false
@@ -30,13 +33,13 @@ class VideoDownloader
     prefix = match_data[:prefix]
     re = Regexp.new(segment_name(match_data[:number]))
 
-    print "Downloading... \033[s"
+    print "Downloading... #{SAVE_POS}"
 
     loop do
       fn = get_segment(url, re, segment_numbner, prefix)
 
       if fn then
-        print "\033[u#{segment_numbner}"
+        print "#{RESTORE_POS}#{ERASE_TO_EOL}#{segment_numbner}"
         segments << fn
         segment_numbner += 1
         break if endno && segment_numbner > endno
@@ -44,7 +47,7 @@ class VideoDownloader
         break
       end
     end
-    puts "\033[udone."
+    puts "#{RESTORE_POS}#{ERASE_TO_EOL}done."
 
     if combine then
       upload combine(segments, prefix), prefix, url
@@ -102,15 +105,15 @@ class VideoDownloader
         files << generate_batch_file(in_tmp_dir("_#{prefix}.bat"), files, source_url, prefix)
       end
 
-      print "Uploading... \033[s"
+      print "Uploading... #{SAVE_POS}"
 
       files.each do |fn|
         sftp.upload!(fn, "#{prefix}/#{File.basename(fn)}")
         File.delete(fn)
-        print "\033[u#{fn}"
+        print "#{RESTORE_POS}#{ERASE_TO_EOL}#{File.basename(fn)}"
       end
 
-      puts "\033[udone.\033[K"
+      puts "#{RESTORE_POS}#{ERASE_TO_EOL}done."
     }
   end
 
@@ -164,13 +167,13 @@ class VideoDownloader
 
     prefix, urls = get_track_list(url)
 
-    print "Downloading... \033[s"
+    print "Downloading... #{SAVE_POS}"
 
     urls.each { |url|
-      print "\033[u#{url}"
+      print "#{RESTORE_POS}#{ERASE_TO_EOL}#{File.basename(url)}"
       segments << get_segment_by_url(url, prefix)
     }
-    puts "\033[udone."
+    puts "#{RESTORE_POS}#{ERASE_TO_EOL}done."
 
     if combine then
       upload combine(segments, prefix), prefix, url
