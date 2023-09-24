@@ -21,7 +21,7 @@ Some downloaders have been moved to support both video file URL and main video p
 
 #### Option 2 (Ruby console):
 1. Launch the console of this project (`rake console`)
-2. Launch the code with the URL obtained at the step above (`dl 'http://video.site/breaking-news-654321'`)
+2. Launch the code with the URL of the webpage where video is located (`dl 'http://video.site/breaking-news-654321'`)
 
 ### OLD method (still works!)
 
