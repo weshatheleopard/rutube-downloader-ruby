@@ -21,20 +21,22 @@ class ZvezdaDownloader < VideoDownloader
 
   def get_track_list(url)
     page = @agent.get(url)
-    page.content =~ /id="media_video">([^<]+)</x
-    base_url = $1
+    md = page.content.match(/flashvars\s=\s(?<json>\{[^}]+})/i)
+    json = JSON.parse(md[:json])
+    base_url = json['file']
 
     res_selection_url = "#{base_url}/index.m3u8"
     res_selection_list = @agent.get(res_selection_url).content
 
-    # Pick the best resolution from the list. In this particular downloader, it is always the same, no need to search
-    selection = 'tracks-v1a1'
+    max_res_playlist = res_selection_list.split("#EXT-X-").
+      map{ |entry| entry.match /RESOLUTION=(?<resolution>\d+x\d+).+\n(?<url>.+)\n/m }.
+      max_by{ |entry| (entry && entry[:resolution]).to_i }[:url]
 
-    track_list_url = "#{base_url}/#{selection}/mono.m3u8"
+    track_list_url = "#{base_url}/#{max_res_playlist}"
     track_list = @agent.get(track_list_url).content
 
-    matches = track_list.scan(/^(.+.ts)$/x)
+    matches = track_list.scan(/^(.+.ts)$/)
 
-    [ base_url[-10..-1], matches.map { |track| "#{base_url}/#{selection}/#{track[0]}" } ]
+    [ base_url[-20...-4], matches.map { |track| "#{base_url}/#{File.dirname(max_res_playlist)}/#{track[0]}" } ]
   end
 end
