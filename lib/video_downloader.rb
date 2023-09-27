@@ -58,16 +58,16 @@ class VideoDownloader
     true
   end
 
-  def in_tmp_dir(file_name)
-    Pathname.new(TMPDIR).join(file_name).to_s
+  def in_tmp_dir(file_name, prefix)
+    Pathname.new(TMPDIR).join(prefix, file_name).to_s
   end
 
   def combine(segments, prefix)
     ffmpeg = `which ffmpeg`
     raise "FFMPEG binary not found" if ffmpeg.empty?
 
-    outfilename = in_tmp_dir("_#{prefix}.mp4")
-    segment_list_file = generate_segment_list(in_tmp_dir('_list.txt'), segments, prefix)
+    outfilename = in_tmp_dir("_#{prefix}.mp4", prefix)
+    segment_list_file = generate_segment_list(in_tmp_dir('_list.txt', prefix), segments, prefix)
     `ffmpeg -f concat -safe 0 -i #{segment_list_file} -c copy #{outfilename}`
     File.delete(segment_list_file)
 
@@ -89,7 +89,7 @@ class VideoDownloader
       end
     end
 
-    full_path = in_tmp_dir("%s-%04d.ts" % [ prefix[-3..-1], n ])
+    full_path = in_tmp_dir("%s-%04d.ts" % [ prefix[-3..-1], n ], prefix)
     newfile.save_as(full_path)
     return full_path
   end
@@ -101,16 +101,16 @@ class VideoDownloader
       sftp.mkdir prefix
 
       if files.size > 1 then
-        files << generate_segment_list(in_tmp_dir('_list.txt'), files, source_url)
-        files << generate_batch_file(in_tmp_dir("_#{prefix}.bat"), files, source_url, prefix)
+        files << generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url)
+        files << generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), files, source_url, prefix)
       end
 
       print "Uploading... #{SAVE_POS}"
 
-      files.each do |fn|
+      files.each_with_index do |fn, idx|
         sftp.upload!(fn, "#{prefix}/#{File.basename(fn)}")
         File.delete(fn)
-        print "#{RESTORE_POS}#{ERASE_TO_EOL}#{File.basename(fn)}"
+        print "#{RESTORE_POS}#{ERASE_TO_EOL} #{File.basename(fn)} (#{idx + 1}/#{files.count})"
       end
 
       puts "#{RESTORE_POS}#{ERASE_TO_EOL}done."
@@ -152,7 +152,7 @@ class VideoDownloader
       end
     end
 
-    full_path = in_tmp_dir(newfile.filename)
+    full_path = in_tmp_dir(newfile.filename, prefix)
     newfile.save_as(full_path)
     return full_path
   end
@@ -169,8 +169,8 @@ class VideoDownloader
 
     print "Downloading... #{SAVE_POS}"
 
-    urls.each { |url|
-      print "#{RESTORE_POS}#{ERASE_TO_EOL}#{File.basename(url)}"
+    urls.each_with_index { |url, idx|
+      print "#{RESTORE_POS}#{ERASE_TO_EOL}#{File.basename(url)} (#{idx + 1}/#{urls.count})"
       segments << get_segment_by_url(url, prefix)
     }
     puts "#{RESTORE_POS}#{ERASE_TO_EOL}done."
