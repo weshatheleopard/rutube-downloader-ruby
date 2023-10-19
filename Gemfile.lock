@@ -1,7 +1,9 @@
 GEM
   remote: https://rubygems.org/
   specs:
+    assert_value (1.5.5)
     connection_pool (2.2.5)
+    diff-lcs (1.5.0)
     domain_name (0.5.20190701)
       unf (>= 0.0.5, < 1.0.0)
     http-cookie (1.0.4)
@@ -32,6 +34,19 @@ GEM
       racc (~> 1.4)
     ntlm-http (0.1.1)
     racc (1.6.0)
+    rspec (3.12.0)
+      rspec-core (~> 3.12.0)
+      rspec-expectations (~> 3.12.0)
+      rspec-mocks (~> 3.12.0)
+    rspec-core (3.12.2)
+      rspec-support (~> 3.12.0)
+    rspec-expectations (3.12.3)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-mocks (3.12.6)
+      diff-lcs (>= 1.2.0, < 2.0)
+      rspec-support (~> 3.12.0)
+    rspec-support (3.12.1)
     unf (0.1.4)
       unf_ext
     unf_ext (0.0.8.1)
@@ -42,8 +57,10 @@ PLATFORMS
   x86_64-linux
 
 DEPENDENCIES
+  assert_value
   mechanize
   net-sftp
+  rspec
 
 RUBY VERSION
    ruby 2.7.6p219
