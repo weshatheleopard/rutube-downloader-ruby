@@ -4,15 +4,15 @@ Download video files from the sites that generally don't want you to download vi
 
 Currently supported:
   * [Twitch](https://www.twitch.tv/)
-  * [RuTube](https://rutube.ru/) (NEW)
-  * [TV Zvezda](https://tvzvezda.ru/) (NEW)
-  * [Fox News](https://www.foxnews.com)
-  * [Rambler News](https://news.rambler.ru/video/) (NEW)
+  * [RuTube](https://rutube.ru/)
+  * [TV Zvezda](https://tvzvezda.ru/)
+  * [Rambler News](https://news.rambler.ru/video/)
+  * [Fox News](https://www.foxnews.com) [OLD]
   
 Others can be added too through respective subclasses
   
 ## How to use:
-Some downloaders have been moved to support both video file URL and main video page URL, which makes downloading more user-friendly. Old method still works, but it is not available for ALL supported downloaders yet.
+Most downloaders have been moved to support both video file URL and main video page URL, which makes downloading more user-friendly. Old method still works.
 
 ### NEW mehod
 

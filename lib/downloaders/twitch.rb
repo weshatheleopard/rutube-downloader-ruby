@@ -1,6 +1,7 @@
 class TwitchDownloader < VideoDownloader
   def self.can_download?(url)
     return :stream if url =~ /cloudfront/i
+    return :page if url =~ /\.twitch\.tv\/videos/i
     false
   end
 
@@ -11,4 +12,35 @@ class TwitchDownloader < VideoDownloader
   def segment_regexp
     /\/(?<prefix>[0-9a-z_]+)\/chunked\/(?<number>\d+).ts$/
   end
+
+  AGENT_ALIAS = 'Windows IE 10' #'
+  CLIENT_ID = 'kimne78kx3ncx6brgo4mv6wki5h1ko'
+
+  def get_track_list(url)
+    md = url.match(/\.twitch\.tv\/videos\/(?<video_id>\d+)/i)
+    video_id = md[:video_id]
+    params = {"operationName"=>"PlaybackAccessToken_Template",
+              "query"=>"query PlaybackAccessToken_Template($login: String!, $isLive: Boolean!, $vodID: ID!, $isVod: Boolean!, $playerType: String!) {  streamPlaybackAccessToken(channelName: $login, params: {platform: \"web\", playerBackend: \"mediaplayer\", playerType: $playerType}) @include(if: $isLive) {    value    signature   authorization { isForbidden forbiddenReasonCode }   __typename  }  videoPlaybackAccessToken(id: $vodID, params: {platform: \"web\", playerBackend: \"mediaplayer\", playerType: $playerType}) @include(if: $isVod) {    value    signature   __typename  }}",
+              "variables"=>{"isLive"=>false, "login"=>"", "isVod"=>true, "vodID"=>video_id, "playerType"=>"site"}}
+
+    json_page = @agent.post('https://gql.twitch.tv/gql', params.to_json,
+      { 'Content-Type' => 'text/plain;charset=UTF-8', 'Client-ID' => CLIENT_ID })
+
+    json =  JSON(json_page.content)
+    signature = json['data']["videoPlaybackAccessToken"]['signature']
+    token = json['data']["videoPlaybackAccessToken"]['value']
+
+    res_selection_list = @agent.get("https://usher.ttvnw.net/vod/#{video_id}.m3u8",
+                                     { sig: signature, token: token, allow_source: true }).content
+
+    max_res_playlist_url = res_selection_list.split("#EXT-X-MEDIA:").
+      map{ |entry| entry.match /BANDWIDTH=(?<bandwidth>\d+).+\n(?<url>.+)\n/m }.
+      max_by{ |entry| (entry && entry[:bandwidth]).to_i }[:url]
+
+    track_list = @agent.get(max_res_playlist_url).content
+    matches = track_list.scan(/^(.+\.ts)$/x)
+
+    [ video_id, matches.map { |track| URI(max_res_playlist_url).merge(track.first).to_s } ]
+  end
+
 end
