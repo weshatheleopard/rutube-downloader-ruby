@@ -1,4 +1,5 @@
 require 'json'
+require_relative '../m3u_parser.rb'
 
 class RutubeDownloader < VideoDownloader
   def self.can_download?(url)
@@ -28,12 +29,8 @@ class RutubeDownloader < VideoDownloader
     page = @agent.get "https://rutube.ru/api/play/options/#{video_id}", [], url
     json = JSON.parse(page.content)
 
-    res_selection_url = json['video_balancer']['m3u8']
-    res_selection_list = @agent.get(res_selection_url).content
-
-    max_res_playlist_url = res_selection_list.split("#EXT-X-").
-      map{ |entry| entry.match /RESOLUTION=(?<resolution>\d+x\d+).+\n(?<url>.+)\n/m }.
-      max_by{ |entry| (entry && entry[:resolution]).to_i }[:url]
+    m3u_data = M3uParser.new(@agent.get(json['video_balancer']['m3u8']).content).parse
+    max_res_playlist_url = m3u_data[:playlists].max_by{ |entry| entry['RESOLUTION'].to_i }[:url]
 
     track_list = @agent.get(max_res_playlist_url).content
     matches = track_list.scan(/^(.+\.ts)$/x)
