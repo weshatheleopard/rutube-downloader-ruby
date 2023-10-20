@@ -25,18 +25,11 @@ class ZvezdaDownloader < VideoDownloader
     json = JSON.parse(md[:json])
     base_url = json['file']
 
-    res_selection_url = "#{base_url}/index.m3u8"
-    res_selection_list = @agent.get(res_selection_url).content
+    m3u_data = M3UParser.new(@agent.get("#{base_url}/index.m3u8").content).parse
+    max_res_playlist = m3u_data[:entries].max_by{ |entry| entry && entry["RESOLUTION"].to_i }[:filename]
 
-    max_res_playlist = res_selection_list.split("#EXT-X-").
-      map{ |entry| entry.match /RESOLUTION=(?<resolution>\d+x\d+).+\n(?<url>.+)\n/m }.
-      max_by{ |entry| (entry && entry[:resolution]).to_i }[:url]
+    m3u_data = M3UParser.new(@agent.get("#{base_url}/#{max_res_playlist}").content).parse
 
-    track_list_url = "#{base_url}/#{max_res_playlist}"
-    track_list = @agent.get(track_list_url).content
-
-    matches = track_list.scan(/^(.+.ts)$/)
-
-    [ base_url[-20...-4], matches.map { |track| "#{base_url}/#{File.dirname(max_res_playlist)}/#{track[0]}" } ]
+    [ base_url[-20...-4], m3u_data[:entries].map { |entry| "#{base_url}/#{File.dirname(max_res_playlist)}/#{entry[:filename]}" } ]
   end
 end
