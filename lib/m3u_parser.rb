@@ -41,46 +41,27 @@ class M3UParser
         end
       when :start then
         case line
-        when /^#EXT-X-STREAM-INF:/ then
-          md = line.match(/^#EXT-X-STREAM-INF:(?<params>.+)$/)
-          if md then
-            push_playlist(params_hash)
-            params_hash = md[:params].scan(/([A-Z0-9-]+)=(?:([A-Za-z0-9-]+)|\"([^"]+)\")/).map(&:compact).to_h
-          end
         when /^#EXTINF:/ then
           md = line.match(/^#EXTINF:(?<params>.+)$/)
           if md then
             push_playlist(params_hash)
             params_hash = { info: md[:params] }
           end
-        when /^#EXT-X-TARGETDURATION:/ then
-          md = line.match(/^#EXT-X-TARGETDURATION:(?<params>.+)$/)
+        when /^#EXT-X-STREAM-INF:/ then
+          md = line.match(/^#EXT-X-STREAM-INF:(?<params>.+)$/)
           if md then
-            @m3u['TARGETDURATION'] = md[:params]
-          end
-        when /^#EXT-X-ALLOW-CACHE:/ then
-          md = line.match(/^#EXT-X-ALLOW-CACHE:(?<params>.+)$/)
-          if md then
-            @m3u['ALLOW-CACHE'] = md[:params]
-          end
-        when /^#EXT-X-PLAYLIST-TYPE:/ then
-          md = line.match(/^#EXT-X-PLAYLIST-TYPE:(?<params>.+)$/)
-          if md then
-            @m3u['PLAYLIST-TYPE'] = md[:params]
-          end
-        when /^#EXT-X-VERSION:/ then
-          md = line.match(/^#EXT-X-VERSION:(?<params>.+)$/)
-          if md then
-            @m3u['VERSION'] = md[:params]
-          end
-        when /^#EXT-X-MEDIA-SEQUENCE:/ then
-          md = line.match(/^#EXT-X-MEDIA-SEQUENCE:(?<params>.+)$/)
-          if md then
-            @m3u['MEDIA-SEQUENCE'] = md[:params]
+            push_playlist(params_hash)
+            params_hash = md[:params].scan(/([A-Z0-9-]+)=(?:([A-Za-z0-9-]+)|\"([^"]+)\")/).map(&:compact).to_h
           end
         when /^#EXT-X-ENDLIST/, '' then
           push_playlist(params_hash)
           break
+        when /^#EXT-X-[A-Z0-9-]+:/ then
+          md = line.match(/^#EXT-X-(?<tag>[A-Z0-9-]+):(?<params>.+)$/)
+          @m3u[md[:tag]] = md[:params] if md
+        when /^#ID3-EQUIV-TDTG:/ then
+          md = line.match(/^#ID3-EQUIV-TDTG:(?<params>.+)$/)
+          @m3u['ID3-EQUIV-TDTG'] = md[:params] if md
         when /^(?!#)http.+/ then
           params_hash[:url] = line
         when /^(?!#).+/ then

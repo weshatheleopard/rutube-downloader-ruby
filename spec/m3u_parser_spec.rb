@@ -19,6 +19,13 @@ RSpec.describe 'M3UParser' do
       assert_value(PP.pp(parser.extract_tracklist('http://some-server.net/some_dir/'), ''),
                     :log => 'spec/references/tracklist_3.ref')
     end
+
+    it 'should correctly parse the M3U file #3' do
+      parser = M3UParser.new(File.read("spec/fixtures/source_data_4.js"))
+      assert_value(PP.pp(parser.parse, ''), :log => 'spec/references/parsed_data_4.ref')
+      assert_value(PP.pp(parser.extract_tracklist('http://some-server.net/some_dir/'), ''),
+                    :log => 'spec/references/tracklist_4.ref')
+    end
   end
 
 end

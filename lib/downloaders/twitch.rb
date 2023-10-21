@@ -30,17 +30,15 @@ class TwitchDownloader < VideoDownloader
     signature = json['data']["videoPlaybackAccessToken"]['signature']
     token = json['data']["videoPlaybackAccessToken"]['value']
 
-    res_selection_list = @agent.get("https://usher.ttvnw.net/vod/#{video_id}.m3u8",
-                                     { sig: signature, token: token, allow_source: true }).content
 
-    max_res_playlist_url = res_selection_list.split("#EXT-X-MEDIA:").
-      map{ |entry| entry.match /BANDWIDTH=(?<bandwidth>\d+).+\n(?<url>.+)\n/m }.
-      max_by{ |entry| (entry && entry[:bandwidth]).to_i }[:url]
+    m3u_data = M3UParser.new(@agent.get("https://usher.ttvnw.net/vod/#{video_id}.m3u8",
+                                          { sig: signature, token: token, allow_source: true }).content).parse
 
-    track_list = @agent.get(max_res_playlist_url).content
-    matches = track_list.scan(/^(.+\.ts)$/x)
+    max_res_playlist_url = m3u_data[:entries].max_by{ |entry| entry && entry["BANDWIDTH"].to_i }[:url]
 
-    [ video_id, matches.map { |track| URI(max_res_playlist_url).merge(track.first).to_s } ]
+    track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
+
+    [ video_id, track_list ]
   end
 
 end

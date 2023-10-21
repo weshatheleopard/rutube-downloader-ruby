@@ -1,0 +1,15 @@
+{"VERSION"=>"3",
+ "TARGETDURATION"=>"11",
+ "ID3-EQUIV-TDTG"=>"2023-09-21T04:29:46",
+ "PLAYLIST-TYPE"=>"EVENT",
+ "MEDIA-SEQUENCE"=>"0",
+ "TWITCH-ELAPSED-SECS"=>"0.000",
+ "TWITCH-TOTAL-SECS"=>"12670.152",
+ :entries=>
+  [{:info=>"10.000,", :filename=>"0.ts"},
+   {:info=>"10.000,", :filename=>"1.ts"},
+   {:info=>"10.000,", :filename=>"2-muted.ts"},
+   {:info=>"10.000,", :filename=>"3-muted.ts"},
+   {:info=>"10.000,", :filename=>"4.ts"},
+   {:info=>"10.000,", :filename=>"5.ts"},
+   {:info=>"10.152,", :filename=>"6.ts"}]}
