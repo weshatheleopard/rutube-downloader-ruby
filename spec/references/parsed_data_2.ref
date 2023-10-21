@@ -3,7 +3,7 @@
  "PLAYLIST-TYPE"=>"VOD",
  "VERSION"=>"3",
  "MEDIA-SEQUENCE"=>"1",
- :playlists=>
+ :entries=>
   [{:info=>"2.000,",
     :filename=>"30f4dbdd36464543ae4c26468a7b0ba3.mp4/segment-1-v1-a1.ts"},
    {:info=>"2.000,",
@@ -751,4 +751,6 @@
    {:info=>"4.000,",
     :filename=>"30f4dbdd36464543ae4c26468a7b0ba3.mp4/segment-373-v1-a1.ts"},
    {:info=>"4.000,",
-    :filename=>"30f4dbdd36464543ae4c26468a7b0ba3.mp4/segment-374-v1-a1.ts"}]}
+    :filename=>"30f4dbdd36464543ae4c26468a7b0ba3.mp4/segment-374-v1-a1.ts"},
+   {:info=>"2.000,",
+    :filename=>"30f4dbdd36464543ae4c26468a7b0ba3.mp4/segment-375-v1-a1.ts"}]}

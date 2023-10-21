@@ -26,7 +26,7 @@ class TwitchDownloader < VideoDownloader
     json_page = @agent.post('https://gql.twitch.tv/gql', params.to_json,
       { 'Content-Type' => 'text/plain;charset=UTF-8', 'Client-ID' => CLIENT_ID })
 
-    json =  JSON(json_page.content)
+    json = JSON(json_page.content)
     signature = json['data']["videoPlaybackAccessToken"]['signature']
     token = json['data']["videoPlaybackAccessToken"]['value']
 

@@ -78,7 +78,9 @@ class M3UParser
           if md then
             @m3u['MEDIA-SEQUENCE'] = md[:params]
           end
-        when /^#EXT-X-ENDLIST/, '' then break
+        when /^#EXT-X-ENDLIST/, '' then
+          push_playlist(params_hash)
+          break
         when /^(?!#)http.+/ then
           params_hash[:url] = line
         when /^(?!#).+/ then
@@ -90,5 +92,15 @@ class M3UParser
     end
 
     @m3u
+  end
+
+  def extract_tracklist(base_url = '')
+    self.parse[:entries].map { |entry|
+      if entry.has_key?(:url) then
+        entry[:url]
+      else
+        URI(base_url).merge(entry[:filename]).to_s
+      end
+    }
   end
 end

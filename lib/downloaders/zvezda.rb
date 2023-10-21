@@ -27,9 +27,10 @@ class ZvezdaDownloader < VideoDownloader
 
     m3u_data = M3UParser.new(@agent.get("#{base_url}/index.m3u8").content).parse
     max_res_playlist = m3u_data[:entries].max_by{ |entry| entry && entry["RESOLUTION"].to_i }[:filename]
+    max_res_playlist_url = "#{base_url}/#{max_res_playlist}"
 
-    m3u_data = M3UParser.new(@agent.get("#{base_url}/#{max_res_playlist}").content).parse
+    track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    [ base_url[-20...-4], m3u_data[:entries].map { |entry| "#{base_url}/#{File.dirname(max_res_playlist)}/#{entry[:filename]}" } ]
+    [ base_url[-20...-4], track_list ]
   end
 end

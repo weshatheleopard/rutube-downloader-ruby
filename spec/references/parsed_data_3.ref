@@ -1,0 +1,8 @@
+{"TARGETDURATION"=>"2",
+ "ALLOW-CACHE"=>"YES",
+ "PLAYLIST-TYPE"=>"VOD",
+ "VERSION"=>"3",
+ "MEDIA-SEQUENCE"=>"1",
+ :entries=>
+  [{:info=>"2.000,", :filename=>"seg-1-v1-a1.ts"},
+   {:info=>"2.000,", :filename=>"seg-2-v1-a1.ts"}]}

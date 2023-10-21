@@ -32,7 +32,8 @@ class RutubeDownloader < VideoDownloader
     m3u_data = M3UParser.new(@agent.get(json['video_balancer']['m3u8']).content).parse
     max_res_playlist_url = m3u_data[:entries].max_by{ |entry| entry['RESOLUTION'].to_i }[:url]
 
-    m3u_data = M3UParser.new(@agent.get(max_res_playlist_url).content).parse
-    [ video_id, m3u_data[:entries].map { |entry| URI(max_res_playlist_url).merge(entry[:filename]).to_s } ]
+    track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
+
+    [ video_id, track_list ]
   end
 end

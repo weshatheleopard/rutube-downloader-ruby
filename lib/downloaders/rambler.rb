@@ -31,16 +31,14 @@ class RamblerDownloader < VideoDownloader
     json = JSON.parse(page.content)
 
     res_selection_url = json['result']['playList']['source']
-    res_selection_list = @agent.get(res_selection_url).content
-
-    md = res_selection_list.scan(/(\#EXT-X-STREAM-INF:(?<inf>[^\n]+)\n(?<url>[^\n]+))/ix)
 
     # Pick the best resolution from the list. In this particular downloader, looks like best is the first one
-    track_list_url = md[0][1]
-    track_list = @agent.get(track_list_url).content
+    m3u_data = M3UParser.new(@agent.get(res_selection_url).content).parse
+    max_res_playlist = m3u_data[:entries].max_by{ |entry| entry && entry["RESOLUTION"].to_i }
+    max_res_playlist_url = max_res_playlist[:url]
 
-    matches = track_list.scan(/(\#EXTINF:(?<inf>[^\n]+)\n(?<url>[^\n]+))/ix)
+    track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    [ video_id, matches.map { |track| URI(track_list_url).merge(track.last).to_s } ]
+    [ video_id, track_list ]
   end
 end
