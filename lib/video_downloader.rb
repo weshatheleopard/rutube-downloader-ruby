@@ -1,6 +1,7 @@
 require 'yaml'
 require 'net/sftp'
 require 'mechanize'
+require 'terminfo'
 
 # Subclasses should definitely overload:
 # * +segment_regexp+
@@ -12,9 +13,13 @@ require 'mechanize'
 
 class VideoDownloader
   TMPDIR = '/tmp'
-  SAVE_POS = "\033[s"
-  RESTORE_POS = "\033[u"
-  ERASE_TO_EOL = "\033[K"
+
+  def initialize
+    t = TermInfo.new
+    @save_pos = t.tigetstr("sc")
+    @restore_pos = t.tigetstr("rc")
+    @erase_to_eol = t.tigetstr("el")
+  end
 
   def self.can_download?(url)
     false
@@ -33,13 +38,13 @@ class VideoDownloader
     prefix = match_data[:prefix]
     re = Regexp.new(segment_name(match_data[:number]))
 
-    print "Downloading... #{SAVE_POS}"
+    print "Downloading... #{@save_pos}"
 
     loop do
       fn = get_segment(url, re, segment_numbner, prefix)
 
       if fn then
-        print "#{RESTORE_POS}#{ERASE_TO_EOL}#{segment_numbner}"
+        print "#{@restore_pos}#{@erase_to_eol}#{segment_numbner}"
         segments << fn
         segment_numbner += 1
         break if endno && segment_numbner > endno
@@ -47,7 +52,7 @@ class VideoDownloader
         break
       end
     end
-    puts "#{RESTORE_POS}#{ERASE_TO_EOL}done."
+    puts "#{@restore_pos}#{@erase_to_eol}done."
 
     if combine then
       upload combine(segments, prefix), prefix, url
@@ -105,15 +110,15 @@ class VideoDownloader
         files << generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), files, source_url, prefix)
       end
 
-      print "Uploading... #{SAVE_POS}"
+      print "Uploading... #{@save_pos}"
 
       files.each_with_index do |fn, idx|
         sftp.upload!(fn, "#{prefix}/#{File.basename(fn)}")
         File.delete(fn)
-        print "#{RESTORE_POS}#{ERASE_TO_EOL} #{File.basename(fn)} (#{idx + 1}/#{files.count})"
+        print "#{@restore_pos}#{@erase_to_eol} #{File.basename(fn)} (#{idx + 1}/#{files.count})"
       end
 
-      puts "#{RESTORE_POS}#{ERASE_TO_EOL}done."
+      puts "#{@restore_pos}#{@erase_to_eol}done."
     }
   end
 
@@ -167,13 +172,13 @@ class VideoDownloader
 
     prefix, urls = get_track_list(url)
 
-    print "Downloading... #{SAVE_POS}"
+    print "Downloading... #{@save_pos}"
 
     urls.each_with_index { |url, idx|
-      print "#{RESTORE_POS}#{ERASE_TO_EOL}#{File.basename(url)} (#{idx + 1}/#{urls.count})"
+      print "#{@restore_pos}#{@erase_to_eol}#{File.basename(url)} (#{idx + 1}/#{urls.count})"
       segments << get_segment_by_url(url, prefix)
     }
-    puts "#{RESTORE_POS}#{ERASE_TO_EOL}done."
+    puts "#{@restore_pos}#{@erase_to_eol}done."
 
     if combine then
       upload combine(segments, prefix), prefix, url

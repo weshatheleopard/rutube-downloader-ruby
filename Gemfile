@@ -3,6 +3,7 @@ ruby '2.7.6'
 
 gem 'mechanize'
 gem 'net-sftp'           # Download files over SFTP
+gem 'ruby-terminfo'
 
 group :development, :test do
   gem 'rspec'
