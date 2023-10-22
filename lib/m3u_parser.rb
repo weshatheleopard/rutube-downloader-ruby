@@ -1,3 +1,5 @@
+require 'uri'
+
 class M3UParser
   def initialize(str)
     @str = str
