@@ -9,3 +9,7 @@ group :development, :test do
   gem 'rspec'
   gem 'assert_value'
 end
+
+group :test do
+  gem 'rspec_junit_formatter'
+end

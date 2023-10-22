@@ -47,6 +47,8 @@ GEM
       diff-lcs (>= 1.2.0, < 2.0)
       rspec-support (~> 3.12.0)
     rspec-support (3.12.1)
+    rspec_junit_formatter (0.6.0)
+      rspec-core (>= 2, < 4, != 2.12.0)
     ruby-terminfo (0.1.1)
     rubyntlm (0.6.3)
     unf (0.1.4)
@@ -63,6 +65,7 @@ DEPENDENCIES
   mechanize
   net-sftp
   rspec
+  rspec_junit_formatter
   ruby-terminfo
 
 RUBY VERSION
