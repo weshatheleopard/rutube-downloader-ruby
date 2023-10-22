@@ -1,4 +1,5 @@
 # rutube-downloader-ruby
+{rdoc-image:https://circleci.com/gh/weshatheleopard/rutube-downloader-ruby.svg?style=svg}[https://circleci.com/gh/weshatheleopard/rutube-downloader-ruby]
 
 Download video files from the sites that generally don't want you to download videos from.
 
