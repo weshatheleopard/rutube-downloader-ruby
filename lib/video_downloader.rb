@@ -64,7 +64,11 @@ class VideoDownloader
   end
 
   def in_tmp_dir(file_name, prefix)
-    Pathname.new(TMPDIR).join(prefix, file_name).to_s
+    tmp_dir_name(prefix).join(file_name).to_s
+  end
+
+  def tmp_dir_name(prefix)
+    Pathname.new(TMPDIR).join(prefix)
   end
 
   def combine(segments, prefix)
@@ -117,6 +121,8 @@ class VideoDownloader
         File.delete(fn)
         print "#{@restore_pos}#{@erase_to_eol} #{File.basename(fn)} (#{idx + 1}/#{files.count})"
       end
+
+      FileUtils.rmdir(tmp_dir_name(prefix))
 
       puts "#{@restore_pos}#{@erase_to_eol}done."
     }
