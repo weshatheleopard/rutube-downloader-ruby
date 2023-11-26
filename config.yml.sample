@@ -3,3 +3,4 @@ SFTP_USER: 'sftp_user'
 SFTP_PORT: 22
 SFTP_PASSWORD: "some_password"
 FFMPEG_PATH: 'C:\ffmpeg-x.x.x-full_build\bin\ffmpeg.exe'
+TMPDIR: '/tmp'

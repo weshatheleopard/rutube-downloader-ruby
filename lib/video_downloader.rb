@@ -3,6 +3,9 @@ require 'net/sftp'
 require 'mechanize'
 require 'terminfo'
 
+require 'term/ansicolor'
+include Term::ANSIColor
+
 # Subclasses should definitely overload:
 # * +segment_regexp+
 #   - Regexp that matches the source URL, returning 1st capture section that contains the video identifier,
@@ -12,8 +15,6 @@ require 'terminfo'
 # * +can_download(url)+ - Boolean, true if the subclass claims that it can properly download +url+.
 
 class VideoDownloader
-  TMPDIR = '/tmp'
-
   def initialize
     t = TermInfo.new
     @save_pos = t.tigetstr("sc")
@@ -31,7 +32,7 @@ class VideoDownloader
       agent.read_timeout = 5
     }
 
-    segment_numbner = start
+    segment_number = start
     segments = []
 
     match_data = url.match(segment_regexp)
@@ -41,18 +42,18 @@ class VideoDownloader
     print "Downloading... #{@save_pos}"
 
     loop do
-      fn = get_segment(url, re, segment_numbner, prefix)
+      fn = get_segment(url, re, segment_number, prefix)
 
       if fn then
-        print "#{@restore_pos}#{@erase_to_eol}#{segment_numbner}"
+        print "#{@restore_pos}#{@erase_to_eol}#{segment_number.yellow}"
         segments << fn
-        segment_numbner += 1
-        break if endno && segment_numbner > endno
+        segment_number += 1
+        break if endno && segment_number > endno
       else
         break
       end
     end
-    puts "#{@restore_pos}#{@erase_to_eol}done."
+    puts "#{@restore_pos}#{@erase_to_eol}#{'done.'.white.bold}"
 
     if combine then
       upload combine(segments, prefix), prefix, url
@@ -68,7 +69,7 @@ class VideoDownloader
   end
 
   def tmp_dir_name(prefix)
-    Pathname.new(TMPDIR).join(prefix)
+    Pathname.new(config('TMPDIR', '/tmp')).join(prefix)
   end
 
   def combine(segments, prefix)
@@ -146,9 +147,9 @@ class VideoDownloader
     bat_path
   end
 
-  def config(k)
+  def config(k, default_value = nil)
     @config ||= YAML.load(File.read("config.yml"))
-    @config[k]
+    @config[k] || default_value
   end
 
   def get_segment_by_url(url, prefix)
@@ -176,15 +177,17 @@ class VideoDownloader
       agent.read_timeout = 5
     }
 
+    puts "Obtaining track list from #{url.white.bold}"
+
     prefix, urls = get_track_list(url)
 
-    print "Downloading... #{@save_pos}"
+    print "Downloading segments... #{@save_pos}"
 
     urls.each_with_index { |url, idx|
-      print "#{@restore_pos}#{@erase_to_eol}#{File.basename(url)} (#{idx + 1}/#{urls.count})"
+      print "#{@restore_pos}#{@erase_to_eol}#{File.basename(url).white.bold} (#{(idx + 1).to_s.yellow}/#{(urls.count).to_s.yellow})"
       segments << get_segment_by_url(url, prefix)
     }
-    puts "#{@restore_pos}#{@erase_to_eol}done."
+    puts "#{@restore_pos}#{@erase_to_eol}#{'done'.white.bold}."
 
     if combine then
       upload combine(segments, prefix), prefix, url
