@@ -16,10 +16,10 @@ include Term::ANSIColor
 
 class VideoDownloader
   def initialize
-    t = TermInfo.new
-    @save_pos = t.tigetstr("sc")
-    @restore_pos = t.tigetstr("rc")
-    @erase_to_eol = t.tigetstr("el")
+    terminfo = TermInfo.new
+    @save_pos = terminfo.tigetstr("sc")
+    @restore_pos = terminfo.tigetstr("rc")
+    @erase_to_eol = terminfo.tigetstr("el")
   end
 
   def self.can_download?(url)
@@ -125,7 +125,7 @@ class VideoDownloader
 
       FileUtils.rmdir(tmp_dir_name(prefix))
 
-      puts "#{@restore_pos}#{@erase_to_eol}done."
+      puts "#{@restore_pos}#{@erase_to_eol}#{'done.'.white.bold}"
     }
   end
 
