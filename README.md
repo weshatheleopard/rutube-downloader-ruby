@@ -4,11 +4,12 @@
 Download video files from the sites that generally don't want you to download videos from.
 
 Currently supported:
+  * [Fox News](https://www.foxnews.com) [OLD only]
   * [Twitch](https://www.twitch.tv/)
+  * [1TV](https://www.1tv.ru) [NEW only]
+  * [Rambler News](https://news.rambler.ru/video/)
   * [RuTube](https://rutube.ru/)
   * [TV Zvezda](https://tvzvezda.ru/)
-  * [Rambler News](https://news.rambler.ru/video/)
-  * [Fox News](https://www.foxnews.com) [OLD]
   
 Others can be added too through respective subclasses
   
@@ -18,7 +19,7 @@ Most downloaders have been moved to support both video file URL and main video p
 ### NEW mehod
 
 #### Option 1 (shell):
-1. In the system shell, execute `dl` script with the URL of the webpage where video is located (`./dl http://video.site/breaking-news-654321`)
+1. In the system shell, execute `dl` script with the URL of the webpage where the video is located (`./dl http://video.site/breaking-news-654321`)
 
 #### Option 2 (Ruby console):
 1. Launch the console of this project (`rake console`)

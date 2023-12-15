@@ -29,7 +29,6 @@ class TwitchDownloader < VideoDownloader
     signature = json['data']['videoPlaybackAccessToken']['signature']
     token = json['data']['videoPlaybackAccessToken']['value']
 
-
     m3u_data = M3UParser.new(@agent.get("https://usher.ttvnw.net/vod/#{video_id}.m3u8",
                                           { sig: signature, token: token, allow_source: true }).content).parse
 

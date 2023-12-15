@@ -22,7 +22,6 @@ class M3UParser
     params_hash = nil
     lines = @str.lines
 
-
     loop do
       line = lines.shift&.strip
 
