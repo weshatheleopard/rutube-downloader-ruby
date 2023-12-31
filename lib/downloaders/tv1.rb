@@ -30,6 +30,6 @@ class Tv1Downloader < VideoDownloader
 
     track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    [ video_id.to_s, track_list ]
+    { id: video_id, track_list: track_list }
   end
 end

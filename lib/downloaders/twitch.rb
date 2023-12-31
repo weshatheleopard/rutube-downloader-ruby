@@ -26,8 +26,8 @@ class TwitchDownloader < VideoDownloader
       { 'Content-Type' => 'text/plain;charset=UTF-8', 'Client-ID' => CLIENT_ID })
 
     json = JSON(json_page.content)
-    signature = json['data']['videoPlaybackAccessToken']['signature']
-    token = json['data']['videoPlaybackAccessToken']['value']
+    signature = json.dig('data', 'videoPlaybackAccessToken', 'signature')
+    token = json.dig('data', 'videoPlaybackAccessToken', 'value')
 
     m3u_data = M3UParser.new(@agent.get("https://usher.ttvnw.net/vod/#{video_id}.m3u8",
                                           { sig: signature, token: token, allow_source: true }).content).parse
@@ -36,7 +36,6 @@ class TwitchDownloader < VideoDownloader
 
     track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    [ video_id, track_list ]
+    { id: video_id, track_list: track_list }
   end
-
 end

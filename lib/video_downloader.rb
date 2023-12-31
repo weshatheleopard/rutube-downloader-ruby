@@ -179,7 +179,13 @@ class VideoDownloader
 
     puts "Obtaining track list from #{url.white.bold}"
 
-    prefix, urls = get_track_list(url)
+    data = get_track_list(url)
+
+    prefix = data[:id]
+    urls = data[:track_list]
+    title = data[:title]
+
+    puts "Video title: #{title.white.bold}" if title
 
     print "Downloading segments... #{@save_pos}"
 

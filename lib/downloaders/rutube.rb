@@ -28,12 +28,13 @@ class RutubeDownloader < VideoDownloader
 
     page = @agent.get "https://rutube.ru/api/play/options/#{video_id}", [], url
     json = JSON.parse(page.content)
+    title = json['title']
 
-    m3u_data = M3UParser.new(@agent.get(json['video_balancer']['m3u8']).content).parse
+    m3u_data = M3UParser.new(@agent.get(json.dig('video_balancer', 'm3u8')).content).parse
     max_res_playlist_url = m3u_data[:entries].max_by{ |entry| entry['RESOLUTION'].to_i }[:url]
 
     track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    [ video_id, track_list ]
+    { id: video_id, track_list: track_list, title: title }
   end
 end

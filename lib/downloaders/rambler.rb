@@ -30,7 +30,7 @@ class RamblerDownloader < VideoDownloader
     page = @agent.get('https://api.vp.rambler.ru/api/v3/records/getPlayerData', params: { id: video_id }.to_json )
     json = JSON.parse(page.content)
 
-    res_selection_url = json['result']['playList']['source']
+    res_selection_url = json.dig('result', 'playList', 'source')
 
     # Pick the best resolution from the list. In this particular downloader, looks like best is the first one
     m3u_data = M3UParser.new(@agent.get(res_selection_url).content).parse
@@ -39,6 +39,6 @@ class RamblerDownloader < VideoDownloader
 
     track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    [ video_id, track_list ]
+    { id: video_id, track_list: track_list }
   end
 end

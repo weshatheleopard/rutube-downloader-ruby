@@ -27,6 +27,7 @@ class ZvezdaDownloader < VideoDownloader
 
     video_id = json.dig('props', 'pageProps', 'news', 'key' )
     m3u_url = json.dig('props', 'pageProps', 'news' ,'media', 'video')
+    title = json.dig('props', 'pageProps', 'news', 'title' )
 
     m3u_data_page = @agent.get(m3u_url)
     m3u_data = M3UParser.new(m3u_data_page.content).parse
@@ -37,6 +38,6 @@ class ZvezdaDownloader < VideoDownloader
 
     track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    [ video_id[0...-5], track_list ]
+    { id: video_id[0...-5], track_list: track_list, title: title }
   end
 end
