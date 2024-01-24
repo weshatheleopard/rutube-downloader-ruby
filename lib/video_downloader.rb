@@ -26,7 +26,7 @@ class VideoDownloader
     false
   end
 
-  def download_video(url, start: 1, endno: nil, combine: false)
+  def download_video(source_url, start: 1, endno: nil, combine: false)
     @agent = Mechanize.new { |agent|
       agent.user_agent_alias = 'Windows IE 10' #'
       agent.read_timeout = 5
@@ -35,14 +35,14 @@ class VideoDownloader
     segment_number = start
     segments = []
 
-    match_data = url.match(segment_regexp)
+    match_data = source_url.match(segment_regexp)
     prefix = match_data[:prefix]
     re = Regexp.new(segment_name(match_data[:number]))
 
     print "Downloading... #{@save_pos}"
 
     loop do
-      fn = get_segment(url, re, segment_number, prefix)
+      fn = get_segment(source_url, re, segment_number, prefix)
 
       if fn then
         print "#{@restore_pos}#{@erase_to_eol}#{segment_number.yellow}"
@@ -56,9 +56,9 @@ class VideoDownloader
     puts "#{@restore_pos}#{@erase_to_eol}#{'done.'.white.bold}"
 
     if combine then
-      upload combine(segments, prefix), prefix, url
+      upload combine(segments, prefix), prefix, source_url
     else
-      upload segments, prefix, url
+      upload segments, prefix, source_url
     end
 
     true
@@ -104,14 +104,14 @@ class VideoDownloader
     return full_path
   end
 
-  def upload(files, prefix, source_url)
+  def upload(files, prefix, source_url, extra_params = {})
     Net::SFTP.start(config('SFTP_SITE'), config('SFTP_USER'),
                      { :port => config('SFTP_PORT'), :password => config('SFTP_PASSWORD'),
                        :non_interactive => true }) { |sftp|
       sftp.mkdir prefix
 
       if files.size > 1 then
-        files << generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url)
+        files << generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url, extra_params)
         files << generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), files, source_url, prefix)
       end
 
@@ -129,9 +129,10 @@ class VideoDownloader
     }
   end
 
-  def generate_segment_list(list_path, arr, source_url)
+  def generate_segment_list(list_path, arr, source_url, extra_params = {})
     File.open(list_path, "w") { |f|
       f.puts "# Segment list from #{source_url}"
+      f.puts "# #{extra_params[:title]}" if extra_params&.has_key?(:title)
       arr.each { |fn| f.puts "file '#{File.basename(fn)}'" }
     }
 
@@ -169,7 +170,7 @@ class VideoDownloader
     return full_path
   end
 
-  def download_video_by_url(url, combine: false)
+  def download_video_by_url(source_url, combine: false)
     segments = []
 
     @agent = Mechanize.new { |agent|
@@ -177,9 +178,9 @@ class VideoDownloader
       agent.read_timeout = 5
     }
 
-    puts "Obtaining track list from #{url.white.bold}"
+    puts "Obtaining track list from #{source_url.white.bold}"
 
-    data = get_track_list(url)
+    data = get_track_list(source_url)
 
     prefix = data[:id]
     urls = data[:track_list]
@@ -196,9 +197,9 @@ class VideoDownloader
     puts "#{@restore_pos}#{@erase_to_eol}#{'done'.white.bold}."
 
     if combine then
-      upload combine(segments, prefix), prefix, url
+      upload combine(segments, prefix), prefix, source_url, data
     else
-      upload segments, prefix, url
+      upload segments, prefix, source_url, data
     end
 
     true
