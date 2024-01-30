@@ -28,16 +28,21 @@ class ZvezdaDownloader < VideoDownloader
     video_id = json.dig('props', 'pageProps', 'news', 'key' )
     m3u_url = json.dig('props', 'pageProps', 'news' ,'media', 'video')
     title = json.dig('props', 'pageProps', 'news', 'title' )
+    created = json.dig('props', 'pageProps', 'news', 'dateCreate' )
 
     m3u_data_page = @agent.get(m3u_url)
     m3u_data = M3UParser.new(m3u_data_page.content).parse
 
     max_res_playlist_name = m3u_data[:entries].max_by{ |entry| entry && entry["RESOLUTION"].to_i }[:filename]
+
+    # URI.path doesn't accept HTML parameters, so strip them off for now, looks like it works fine without.
+    max_res_playlist_name = max_res_playlist_name.split('?').first
+
     max_res_playlist_url = m3u_data_page.uri
     max_res_playlist_url.path = max_res_playlist_url.path.gsub(/([^\/]+?)$/, max_res_playlist_name)
 
     track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    { id: video_id[0...-5], track_list: track_list, title: title }
+    { id: video_id[0...-5], track_list: track_list, title: title, created: created }
   end
 end

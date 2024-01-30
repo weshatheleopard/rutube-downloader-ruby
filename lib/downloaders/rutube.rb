@@ -26,6 +26,15 @@ class RutubeDownloader < VideoDownloader
     md = url.match(/video\/(?<video_id>[0-9a-f]+)/i)
     video_id = md[:video_id]
 
+    created_at =
+      begin # Attempt to retrieve creation date
+        video_page = @agent.get(url)
+        metadata = JSON.parse(video_page.content.match(/reduxState\s*=\s*(?<json>{(.+)});/)[:json])
+        metadata['video']['entities'][video_id]['video']['created_ts']
+      rescue
+        nil
+      end
+
     page = @agent.get "https://rutube.ru/api/play/options/#{video_id}", [], url
     json = JSON.parse(page.content)
     title = json['title']
@@ -35,6 +44,6 @@ class RutubeDownloader < VideoDownloader
 
     track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    { id: video_id, track_list: track_list, title: title }
+    { id: video_id, track_list: track_list, title: title, created: created_at }
   end
 end

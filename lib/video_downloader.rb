@@ -131,8 +131,9 @@ class VideoDownloader
 
   def generate_segment_list(list_path, arr, source_url, extra_params = {})
     File.open(list_path, "w") { |f|
-      f.puts "# Segment list from #{source_url}"
+      f.puts "# Segment list for #{source_url}"
       f.puts "# #{extra_params[:title]}" if extra_params&.has_key?(:title)
+      f.puts "# Created: #{extra_params[:created]}" if extra_params&.has_key?(:created)
       arr.each { |fn| f.puts "file '#{File.basename(fn)}'" }
     }
 
@@ -185,8 +186,10 @@ class VideoDownloader
     prefix = data[:id]
     urls = data[:track_list]
     title = data[:title]
+    created = data[:created]
 
     puts "Video title: #{title.white.bold}" if title
+    puts "Video created: #{created.white.bold}" if created
 
     print "Downloading segments... #{@save_pos}"
 
