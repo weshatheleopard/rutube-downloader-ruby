@@ -120,7 +120,7 @@ class VideoDownloader
       files.each_with_index do |fn, idx|
         sftp.upload!(fn, "#{prefix}/#{File.basename(fn)}")
         File.delete(fn)
-        print "#{@restore_pos}#{@erase_to_eol} #{File.basename(fn)} (#{idx + 1}/#{files.count})"
+        print "#{@restore_pos}#{@erase_to_eol} #{File.basename(fn).white.bold} (#{(idx + 1).to_s.yellow}/#{(files.count).to_s.yellow})"
       end
 
       FileUtils.rmdir(tmp_dir_name(prefix))
@@ -132,8 +132,11 @@ class VideoDownloader
   def generate_segment_list(list_path, arr, source_url, extra_params = {})
     File.open(list_path, "w") { |f|
       f.puts "# Segment list for #{source_url}"
-      f.puts "# #{extra_params[:title]}" if extra_params&.has_key?(:title)
-      f.puts "# Created: #{extra_params[:created]}" if extra_params&.has_key?(:created)
+
+      { title: 'Title', created: 'Created', resolution: 'Resolution' }.each_pair { |k,v|
+        f.puts "# #{v}: #{extra_params[k]}" if extra_params&.has_key?(k)
+      }
+
       arr.each { |fn| f.puts "file '#{File.basename(fn)}'" }
     }
 
