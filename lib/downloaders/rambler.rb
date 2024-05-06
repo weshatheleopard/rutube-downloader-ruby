@@ -34,7 +34,7 @@ class RamblerDownloader < VideoDownloader
 
     # Pick the best resolution from the list. In this particular downloader, looks like best is the first one
     m3u_data = M3UParser.new(agent.get(res_selection_url).content).parse
-    max_res_playlist = m3u_data[:entries].max_by{ |entry| entry && entry["RESOLUTION"].to_i }
+    max_res_playlist = m3u_data[:entries].max_by{ |entry| entry && entry['RESOLUTION'].to_i }
     max_res_playlist_url = max_res_playlist[:url]
 
     track_list = M3UParser.new(agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)

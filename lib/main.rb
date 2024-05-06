@@ -1,4 +1,4 @@
-require_relative 'video_downloader.rb'
+require_relative 'video_downloader'
 
 Dir['lib/downloaders/*.rb'].each { |fn| require(File.expand_path(fn)) }
 
@@ -13,9 +13,9 @@ def dl(*args)
 
   case download_type
   when :page then
-     downloder_class&.new&.download_video_by_url(*args)
+    downloder_class&.new&.download_video_by_url(*args)
   else # stream
-     downloder_class&.new&.download_video(*args)
+    downloder_class&.new&.download_video(*args)
   end
 
 end

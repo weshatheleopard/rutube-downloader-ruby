@@ -7,7 +7,7 @@ class M3UParser
   end
 
   def unknown(str, state)
-     puts "=> Unknown line: [#{str}] in #{state}"
+    puts "=> Unknown line: [#{str}] in #{state}"
   end
 
   def push_playlist(pl)
@@ -52,7 +52,7 @@ class M3UParser
           md = line.match(/^#EXT-X-STREAM-INF:(?<params>.+)$/)
           if md then
             push_playlist(params_hash)
-            params_hash = md[:params].scan(/([A-Z0-9-]+)=(?:([A-Za-z0-9-]+)|\"([^"]+)\")/).map(&:compact).to_h
+            params_hash = md[:params].scan(/([A-Z0-9-]+)=(?:([A-Za-z0-9-]+)|"([^"]+)")/).map(&:compact).to_h
           end
         when /^#EXT-X-ENDLIST/, '' then
           push_playlist(params_hash)

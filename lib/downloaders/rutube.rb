@@ -1,5 +1,5 @@
 require 'json'
-require_relative '../m3u_parser.rb'
+require_relative '../m3u_parser'
 
 class RutubeDownloader < VideoDownloader
   def self.can_download?(url)

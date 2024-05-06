@@ -19,11 +19,11 @@ class Tv1Downloader < VideoDownloader
     # file_hash = hsh['sources'].find { |sub_hsh| sub_hsh["type"] == "video/mp4" }
     # full_video_url = file_hash['src']
 
-    segment_list_url = hsh['sources'].find { |sub_hsh| sub_hsh["type"] == "application/x-mpegURL" }["src"]
+    segment_list_url = hsh['sources'].find { |sub_hsh| sub_hsh['type'] == 'application/x-mpegURL' }['src']
 
     segment_list_page = agent.get(segment_list_url)
     m3u_data = M3UParser.new(segment_list_page.content).parse
-    max_res_playlist_name = m3u_data[:entries].max_by{ |entry| entry && entry["RESOLUTION"].to_i }[:filename]
+    max_res_playlist_name = m3u_data[:entries].max_by{ |entry| entry && entry['RESOLUTION'].to_i }[:filename]
 
     max_res_playlist_url = segment_list_page.uri
     max_res_playlist_url.path = max_res_playlist_url.path.gsub(/([^\/]+?)$/, max_res_playlist_name)

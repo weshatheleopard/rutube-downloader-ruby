@@ -4,6 +4,6 @@
 require 'bundler'
 Bundler.require
 
-require_relative 'lib/main.rb'
+require_relative 'lib/main'
 
 dl ARGV[0]

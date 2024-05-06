@@ -4,7 +4,6 @@ require 'mechanize'
 require 'terminfo'
 
 require 'term/ansicolor'
-include Term::ANSIColor
 
 # Subclasses should definitely overload:
 # * +segment_regexp+
@@ -15,14 +14,16 @@ include Term::ANSIColor
 # * +can_download(url)+ - Boolean, true if the subclass claims that it can properly download +url+.
 
 class VideoDownloader
+  include Term::ANSIColor
+
   def initialize
     terminfo = TermInfo.new
-    @save_pos = terminfo.tigetstr("sc")
-    @restore_pos = terminfo.tigetstr("rc")
-    @erase_to_eol = terminfo.tigetstr("el")
+    @save_pos = terminfo.tigetstr('sc')
+    @restore_pos = terminfo.tigetstr('rc')
+    @erase_to_eol = terminfo.tigetstr('el')
   end
 
-  def self.can_download?(url)
+  def self.can_download?(_url)
     false
   end
 
@@ -69,7 +70,7 @@ class VideoDownloader
 
   def combine(segments, prefix)
     ffmpeg = `which ffmpeg`
-    raise "FFMPEG binary not found" if ffmpeg.empty?
+    raise 'FFMPEG binary not found' if ffmpeg.empty?
 
     outfilename = in_tmp_dir("_#{prefix}.mp4", prefix)
     segment_list_file = generate_segment_list(in_tmp_dir('_list.txt', prefix), segments, prefix)
@@ -94,7 +95,7 @@ class VideoDownloader
       end
     end
 
-    full_path = in_tmp_dir("%s-%04d.ts" % [ prefix[-3..-1], n ], prefix)
+    full_path = in_tmp_dir('%s-%04d.ts' % [ prefix[-3..-1], n ], prefix)
     newfile.save_as(full_path)
     return full_path
   end
@@ -107,7 +108,7 @@ class VideoDownloader
 
       if files.size > 1 then
         files << generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url, extra_params)
-        files << generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), files, source_url, prefix)
+        files << generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), source_url, prefix)
       end
 
       print "Uploading... #{@save_pos}"
@@ -125,7 +126,7 @@ class VideoDownloader
   end
 
   def generate_segment_list(list_path, arr, source_url, extra_params = {})
-    File.open(list_path, "w") { |f|
+    File.open(list_path, 'w') { |f|
       f.puts "# Segment list for #{source_url}"
 
       { title: 'Title', created: 'Created', resolution: 'Resolution' }.each_pair { |k, v|
@@ -138,8 +139,8 @@ class VideoDownloader
     list_path
   end
 
-  def generate_batch_file(bat_path, arr, source_url, prefix)
-    File.open(bat_path, "w") { |f|
+  def generate_batch_file(bat_path, source_url, prefix)
+    File.open(bat_path, 'w') { |f|
       f.puts "rem #{source_url}"
       f.puts "#{config('FFMPEG_PATH')} -f concat -safe 0 -i _list.txt -c copy _#{prefix}.mp4"
     }
@@ -148,7 +149,7 @@ class VideoDownloader
   end
 
   def config(k, default_value = nil)
-    @config ||= YAML.load(File.read("config.yml"))
+    @config ||= YAML.load_file('config.yml')
     @config[k] || default_value
   end
 

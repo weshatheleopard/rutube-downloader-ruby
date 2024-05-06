@@ -1,0 +1,20 @@
+AllCops:
+  NewCops: enable
+  SuggestExtensions: false
+  DisplayCopNames: true
+  DisplayStyleGuide: true
+  Exclude:
+    - Gemfile
+
+Style/MultilineIfThen:
+  Enabled: false
+
+Style/BlockDelimiters:
+  Enabled: false
+
+Style/HashSyntax:
+  Enabled: false
+
+Style/MultilineWhenThen:
+  Enabled: false
+
