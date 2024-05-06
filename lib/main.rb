@@ -17,5 +17,4 @@ def dl(*args)
   else # stream
     downloder_class&.new&.download_video(*args)
   end
-
 end

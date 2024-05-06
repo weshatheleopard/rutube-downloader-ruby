@@ -10,11 +10,11 @@ class M3UParser
     puts "=> Unknown line: [#{str}] in #{state}"
   end
 
-  def push_playlist(pl)
-    return if pl.nil? || pl.empty?
+  def push_playlist(playlist)
+    return if playlist.nil? || playlist.empty?
     @m3u ||= {}
     @m3u[:entries] ||= []
-    @m3u[:entries] << pl
+    @m3u[:entries] << playlist
   end
 
   def parse

@@ -18,3 +18,11 @@ Style/HashSyntax:
 Style/MultilineWhenThen:
   Enabled: false
 
+Metrics/MethodLength:
+  Enabled: false
+
+Naming/MethodParameterName:
+  Enabled: false
+
+Style/PreferredHashMethods:
+  Enabled: false

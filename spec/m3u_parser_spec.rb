@@ -27,5 +27,4 @@ RSpec.describe 'M3UParser' do
                     :log => 'spec/references/tracklist_4.ref')
     end
   end
-
 end

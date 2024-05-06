@@ -4,6 +4,7 @@ require 'mechanize'
 require 'terminfo'
 
 require 'term/ansicolor'
+include Term::ANSIColor
 
 # Subclasses should definitely overload:
 # * +segment_regexp+
@@ -14,8 +15,6 @@ require 'term/ansicolor'
 # * +can_download(url)+ - Boolean, true if the subclass claims that it can properly download +url+.
 
 class VideoDownloader
-  include Term::ANSIColor
-
   def initialize
     terminfo = TermInfo.new
     @save_pos = terminfo.tigetstr('sc')
@@ -38,17 +37,17 @@ class VideoDownloader
     print "Downloading... #{@save_pos}"
 
     loop do
+      break if endno && segment_number > endno
+
       fn = get_segment(source_url, re, segment_number, prefix)
 
-      if fn then
-        print "#{@restore_pos}#{@erase_to_eol}#{segment_number.yellow}"
-        segments << fn
-        segment_number += 1
-        break if endno && segment_number > endno
-      else
-        break
-      end
+      break unless fn
+
+      print "#{@restore_pos}#{@erase_to_eol}#{segment_number.yellow}"
+      segments << fn
+      segment_number += 1
     end
+
     puts "#{@restore_pos}#{@erase_to_eol}#{'done.'.white.bold}"
 
     if combine then
@@ -209,5 +208,4 @@ class VideoDownloader
     }
   end
   private :agent
-
 end

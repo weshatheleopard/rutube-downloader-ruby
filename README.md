@@ -4,7 +4,7 @@
 Download video files from the sites that generally don't want you to download videos from.
 
 Currently supported:
-  * [Dzen](https://dzen.ru/)
+  * [Dzen](https://dzen.ru/) [NEW only]
   * [Fox News](https://www.foxnews.com) [OLD only]
   * [Twitch](https://www.twitch.tv/)
   * [1TV](https://www.1tv.ru) [NEW only]
