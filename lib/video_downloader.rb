@@ -27,11 +27,6 @@ class VideoDownloader
   end
 
   def download_video(source_url, start: 1, endno: nil, combine: false)
-    @agent = Mechanize.new { |agent|
-      agent.user_agent_alias = 'Windows IE 10' #'
-      agent.read_timeout = 5
-    }
-
     segment_number = start
     segments = []
 
@@ -87,7 +82,7 @@ class VideoDownloader
   # RETURNS: `true` if there are further segments
   def get_segment(url, re, n, prefix)
     begin
-      newfile = @agent.get(url.gsub(re, segment_name(n)))
+      newfile = agent.get(url.gsub(re, segment_name(n)))
 
       return false unless newfile.instance_of?(Mechanize::File)
     rescue Net::ReadTimeout
@@ -133,7 +128,7 @@ class VideoDownloader
     File.open(list_path, "w") { |f|
       f.puts "# Segment list for #{source_url}"
 
-      { title: 'Title', created: 'Created', resolution: 'Resolution' }.each_pair { |k,v|
+      { title: 'Title', created: 'Created', resolution: 'Resolution' }.each_pair { |k, v|
         f.puts "# #{v}: #{extra_params[k]}" if extra_params&.has_key?(k)
       }
 
@@ -159,7 +154,7 @@ class VideoDownloader
 
   def get_segment_by_url(url, prefix)
     begin
-      newfile = @agent.get(url)
+      newfile = agent.get(url)
     rescue Net::ReadTimeout
       retry
     rescue Mechanize::ResponseCodeError => e
@@ -176,11 +171,6 @@ class VideoDownloader
 
   def download_video_by_url(source_url, combine: false)
     segments = []
-
-    @agent = Mechanize.new { |agent|
-      agent.user_agent_alias = self.class.const_get(:AGENT_ALIAS)
-      agent.read_timeout = 5
-    }
 
     puts "Obtaining track list from #{source_url.white.bold}"
 
@@ -210,5 +200,13 @@ class VideoDownloader
 
     true
   end
+
+  def agent
+    @agent ||= Mechanize.new { |agent|
+      agent.user_agent_alias = self.class.const_get(:AGENT_ALIAS)
+      agent.read_timeout = 5
+    }
+  end
+  private :agent
 
 end

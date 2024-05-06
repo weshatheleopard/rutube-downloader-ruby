@@ -9,9 +9,9 @@ class Tv1Downloader < VideoDownloader
   AGENT_ALIAS = 'Windows IE 10' #'
 
   def get_track_list(url)
-    page = @agent.get(url)
+    page = agent.get(url)
     md = page.content.match(/data-playlist-url="(?<path>[^"]+)"/)
-    json = JSON.parse(@agent.get(md[:path]).content)
+    json = JSON.parse(agent.get(md[:path]).content)
     hsh = json[0]
     video_id = hsh['id']
 
@@ -21,14 +21,14 @@ class Tv1Downloader < VideoDownloader
 
     segment_list_url = hsh['sources'].find { |sub_hsh| sub_hsh["type"] == "application/x-mpegURL" }["src"]
 
-    segment_list_page = @agent.get(segment_list_url)
+    segment_list_page = agent.get(segment_list_url)
     m3u_data = M3UParser.new(segment_list_page.content).parse
     max_res_playlist_name = m3u_data[:entries].max_by{ |entry| entry && entry["RESOLUTION"].to_i }[:filename]
 
     max_res_playlist_url = segment_list_page.uri
     max_res_playlist_url.path = max_res_playlist_url.path.gsub(/([^\/]+?)$/, max_res_playlist_name)
 
-    track_list = M3UParser.new(@agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
+    track_list = M3UParser.new(agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
     { id: video_id, track_list: track_list }
   end
