@@ -178,11 +178,10 @@ class VideoDownloader
 
     prefix = data[:id]
     urls = data[:track_list]
-    title = data[:title]
-    created = data[:created]
 
-    puts "Video title: #{title.white.bold}" if title
-    puts "Video created: #{created.white.bold}" if created
+    { title: 'Title', created: 'Created', resolution: 'Resolution' }.each_pair { |k, v|
+      puts "Video #{v}: #{data[k].white.bold}" if data&.has_key?(k)
+    }
 
     print "Downloading segments... #{@save_pos}"
 
