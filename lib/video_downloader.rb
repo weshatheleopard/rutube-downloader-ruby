@@ -115,7 +115,7 @@ class VideoDownloader
       files.each_with_index do |fn, idx|
         sftp.upload!(fn, "#{prefix}/#{File.basename(fn)}")
         File.delete(fn)
-        print "#{@restore_pos}#{@erase_to_eol} #{File.basename(fn).white.bold} (#{(idx + 1).to_s.yellow}/#{(files.count).to_s.yellow})"
+        print "#{@restore_pos}#{@erase_to_eol} #{File.basename(fn).white.bold} (#{(idx + 1).to_s.yellow}/#{files.count.to_s.yellow})"
       end
 
       FileUtils.rmdir(tmp_dir_name(prefix))
@@ -186,7 +186,7 @@ class VideoDownloader
     print "Downloading segments... #{@save_pos}"
 
     urls.each_with_index { |url, idx|
-      print "#{@restore_pos}#{@erase_to_eol}#{File.basename(url).white.bold} (#{(idx + 1).to_s.yellow}/#{(urls.count).to_s.yellow})"
+      print "#{@restore_pos}#{@erase_to_eol}#{File.basename(url).white.bold} (#{(idx + 1).to_s.yellow}/#{urls.count.to_s.yellow})"
       segments << get_segment_by_url(url, prefix)
     }
     puts "#{@restore_pos}#{@erase_to_eol}#{'done'.white.bold}."

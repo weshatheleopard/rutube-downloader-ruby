@@ -10,6 +10,7 @@ Currently supported:
   * [1TV](https://www.1tv.ru) [NEW only]
   * [Rambler News](https://news.rambler.ru/video/)
   * [RuTube](https://rutube.ru/)
+  * [Smotrim](https://smotrim.ru/)
   * [TV Zvezda](https://tvzvezda.ru/)
   
 Others can be added too through respective subclasses
