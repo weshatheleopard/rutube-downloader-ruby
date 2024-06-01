@@ -1,6 +1,6 @@
 class RamblerDownloader < VideoDownloader
   def self.can_download?(url)
-    return :page if url =~ /(^.+rambler\.ru\/[^\/]+\/(\d+)-)/
+    return :page if url =~ %r{(^.+rambler\.ru/[^/]+/(\d+)-)}
     return :stream if url =~ /rambler/i
     false
   end
@@ -10,7 +10,7 @@ class RamblerDownloader < VideoDownloader
   end
 
   def segment_regexp
-    /\/(?<prefix>[a-zA-Z0-9]+)\.mp4\/seg-(?<number>\d+)-/
+    %r{/(?<prefix>[a-zA-Z0-9]+)\.mp4/seg-(?<number>\d+)-}
   end
 
   # For automatic dowloading by video page URL
@@ -22,7 +22,7 @@ class RamblerDownloader < VideoDownloader
     uri.query = nil
     page = agent.get(uri)
 
-    json_str = page.content.match(/<script>window.__PRELOADED_STATE__=(.+?)<\/script>/)[1]
+    json_str = page.content.match(%r{<script>window.__PRELOADED_STATE__=(.+?)</script>})[1]
     json = JSON.parse(json_str.gsub(/new Date\("[^"]+"\)/, '""'))
     entries = json.dig('commonData', 'entries', 'entities')
     video_id = entries.collect { |e| e.dig(1, 'video', 'recordId') }.delete_if(&:empty?).first

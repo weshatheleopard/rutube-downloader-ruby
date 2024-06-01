@@ -1,6 +1,6 @@
 class Tv1Downloader < VideoDownloader
   def self.can_download?(url)
-    return :page if url =~ /1tv\.ru\/(.+)/i
+    return :page if url =~ %r{1tv\.ru/(.+)}i
     false
   end
 
@@ -26,7 +26,7 @@ class Tv1Downloader < VideoDownloader
     max_res_playlist_name = m3u_data[:entries].max_by{ |entry| entry && entry['RESOLUTION'].to_i }[:filename]
 
     max_res_playlist_url = segment_list_page.uri
-    max_res_playlist_url.path = max_res_playlist_url.path.gsub(/([^\/]+?)$/, max_res_playlist_name)
+    max_res_playlist_url.path = max_res_playlist_url.path.gsub(%r{([^/]+?)$}, max_res_playlist_name)
 
     track_list = M3UParser.new(agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 

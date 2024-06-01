@@ -3,8 +3,8 @@ require_relative '../m3u_parser'
 
 class RutubeDownloader < VideoDownloader
   def self.can_download?(url)
-    return :stream if url =~ /rutube\.ru\/.+\.ts/i
-    return :page if url =~ /rutube\.ru\/video\//i
+    return :stream if url =~ %r{rutube\.ru/.+\.ts}i
+    return :page if url =~ %r{rutube\.ru/video/}i
     false
   end
 
@@ -15,7 +15,7 @@ class RutubeDownloader < VideoDownloader
   end
 
   def segment_regexp
-    /\/(?<prefix>[a-z0-9]+)\.mp4\/segment-(?<number>\d+)-/
+    %r{/(?<prefix>[a-z0-9]+)\.mp4/segment-(?<number>\d+)-}
   end
 
   # For automatic dowloading by video page URL
@@ -23,7 +23,7 @@ class RutubeDownloader < VideoDownloader
   AGENT_ALIAS = 'Windows Firefox' #'
 
   def get_track_list(url)
-    md = url.match(/video\/(?<video_id>[0-9a-f]+)/i)
+    md = url.match(%r{video/(?<video_id>[0-9a-f]+)}i)
     video_id = md[:video_id]
 
     created_at =

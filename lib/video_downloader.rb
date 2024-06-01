@@ -155,7 +155,7 @@ class VideoDownloader
   def get_segment_by_url(url, prefix)
     begin
       newfile = agent.get(url)
-    rescue Net::ReadTimeout
+    rescue Net::ReadTimeout, Net::OpenTimeout
       retry
     rescue Mechanize::ResponseCodeError => e
       case e.response_code

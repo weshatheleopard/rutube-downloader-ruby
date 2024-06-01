@@ -1,6 +1,6 @@
 class DzenDownloader < VideoDownloader
   def self.can_download?(url)
-    return :page if url =~ /(^.+dzen\.ru\/video\/watch\/([a-f0-9]+))/
+    return :page if url =~ %r{(^.+dzen\.ru/video/watch/([a-f0-9]+))}
     false
   end
 
@@ -33,7 +33,7 @@ class DzenDownloader < VideoDownloader
     max_res_playlist_name = max_res_entry[:filename].split('?').first
 
     max_res_playlist_url = URI(res_selection_url)
-    max_res_playlist_url.path = max_res_playlist_url.path.gsub(/([^\/]+?)$/, max_res_playlist_name)
+    max_res_playlist_url.path = max_res_playlist_url.path.gsub(%r{([^/]+?)$}, max_res_playlist_name)
 
     track_list = M3UParser.new(agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
     track_list.map! { |itm| itm.split('?').first }
