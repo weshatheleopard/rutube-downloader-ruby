@@ -31,6 +31,7 @@ class SmotrimDownloader < VideoDownloader
 
     track_list = M3UParser.new(agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    { id: video_id, track_list: track_list, title: title, created: created_at }
+    { id: video_id, track_list: track_list, title: title, created: created_at,
+      resolution: "#{data.dig('width')}x#{data.dig('height')}" }
   end
 end
