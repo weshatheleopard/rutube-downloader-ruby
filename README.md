@@ -8,6 +8,7 @@ Currently supported:
   * [Fox News](https://www.foxnews.com) [OLD only]
   * [Twitch](https://www.twitch.tv/)
   * [1TV](https://www.1tv.ru) [NEW only]
+  * [Platforma](https://plvideo.ru) [NEW only]
   * [Rambler News](https://news.rambler.ru/video/)
   * [RuTube](https://rutube.ru/)
   * [Smotrim](https://smotrim.ru/)
