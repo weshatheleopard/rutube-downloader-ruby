@@ -205,16 +205,7 @@ class VideoDownloader
     @agent ||= Mechanize.new { |agent|
       agent.user_agent_alias = self.class.const_get(:AGENT_ALIAS)
       agent.read_timeout = 5
-
-      agent.content_encoding_hooks << lambda do |_a, _uri, response, body_io|
-        case response['Content-Encoding'].to_s
-        when 'br' then
-          response['Content-Encoding'] = 'none'
-          body_io.string = Brotli.inflate(body_io.read)
-        end
-      end
     }
-
   end
   private :agent
 end
