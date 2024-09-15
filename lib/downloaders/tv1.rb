@@ -13,6 +13,9 @@ class Tv1Downloader < VideoDownloader
     md = page.content.match(/data-playlist-url="(?<path>[^"]+)"/)
     json = JSON.parse(agent.get(md[:path]).content)
     hsh = json[0]
+
+    title  = hsh['title']
+    created = hsh['date_air']
     video_id = hsh['id']
 
     # Option to obtain the URL of the complete video
@@ -23,13 +26,16 @@ class Tv1Downloader < VideoDownloader
 
     segment_list_page = agent.get(segment_list_url)
     m3u_data = M3UParser.new(segment_list_page.content).parse
-    max_res_playlist_name = m3u_data[:entries].max_by{ |entry| entry && entry['RESOLUTION'].to_i }[:filename]
+    max_res_playlist = m3u_data[:entries].max_by{ |entry| entry && entry['RESOLUTION'].to_i }
+    max_res_playlist_name = max_res_playlist[:filename]
 
     max_res_playlist_url = segment_list_page.uri
     max_res_playlist_url.path = max_res_playlist_url.path.gsub(%r{([^/]+?)$}, max_res_playlist_name)
 
     track_list = M3UParser.new(agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
 
-    { id: video_id.to_s, track_list: track_list }
+    { id: video_id.to_s, title: title, created: created,
+      track_list: track_list, resolution: max_res_playlist['RESOLUTION'] }
+
   end
 end

@@ -163,6 +163,9 @@ class VideoDownloader
       when '403', '404' then return false
       else retry
       end
+    rescue Mechanize::ResponseReadError => e
+      print "  #{e.message.red.bold}"
+      retry
     end
 
     full_path = in_tmp_dir(newfile.filename, prefix)
