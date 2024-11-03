@@ -11,18 +11,15 @@ class DzenDownloader < VideoDownloader
     agent.cookie_jar.add(Mechanize::Cookie.new('zen_vk_sso_checked', '1', :domain => '.dzen.ru', :path => '/'))
 
     page = agent.get(url)
-    match_data = page.content.match(/\(\((?<json>{"data":{"MICRO_APP_SSR_DATA"(.+))\)\)/)
+    match_data = page.content.match(/var _params=\((?<json>{"ssrData":(.+))\);/);1
     json = JSON::parse match_data['json']
 
-    data1 = json.dig('data', 'MICRO_APP_SSR_DATA', 'settings', 'exportData', 'video')
-
-    video_id = data1['publicationObjectId']
+    data1 = json.dig('ssrData',"videoMetaResponse")
+    video_id = data1['id']
     created_at = Time.at(data1['publicationDate'].to_i).to_date.strftime('%F')
+    title = data1['title']
 
-    data = data1.dig('rawStreams', 'SingleStream', 0)
- 
-    title = data['Title']
-
+    data = json.dig('ssrData', "streamsResponse", "SingleStream", 0)
     data2 = data.dig('StreamInfo').find { |h| h['StreamType'] == 'ST_HLS' }
     res_selection_url = data2['OutputStream']
 
