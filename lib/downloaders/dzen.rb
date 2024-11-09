@@ -25,7 +25,10 @@ class DzenDownloader < VideoDownloader
 
     m3u_data = M3UParser.new(agent.get(res_selection_url).content).parse
 
+
     max_res_entry = m3u_data[:entries].max_by{ |entry| entry && entry['RESOLUTION'].to_i }
+    resolution = max_res_entry["RESOLUTION"]
+
     # URI.path doesn't accept HTML parameters, so strip them off for now, looks like it works fine without.
     max_res_playlist_name = max_res_entry[:filename].split('?').first
 
@@ -35,6 +38,6 @@ class DzenDownloader < VideoDownloader
     track_list = M3UParser.new(agent.get(max_res_playlist_url).content).extract_tracklist(max_res_playlist_url)
     track_list.map! { |itm| itm.split('?').first }
 
-    { id: video_id, track_list: track_list, title: title, created: created_at }
+    { id: video_id, track_list: track_list, title: title, created: created_at, resolution: resolution }
   end
 end
