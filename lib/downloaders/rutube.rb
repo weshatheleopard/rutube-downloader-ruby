@@ -26,14 +26,9 @@ class RutubeDownloader < VideoDownloader
     md = url.match(%r{video/(?<video_id>[0-9a-f]+)}i)
     video_id = md[:video_id]
 
-    created_at =
-      begin # Attempt to retrieve creation date
-        video_page = agent.get(url)
-        metadata = JSON.parse(video_page.content.match(/reduxState\s*=\s*(?<json>{(.+)});/)[:json])
-        metadata['video']['entities'][video_id]['video']['created_ts']
-      rescue
-        nil
-      end
+    page = agent.get("https://rutube.ru/api/video/#{video_id}", [], url)
+    json = JSON.parse(page.content)
+    created_at = json['created_ts']
 
     page = agent.get("https://rutube.ru/api/play/options/#{video_id}", [], url)
     json = JSON.parse(page.content)
