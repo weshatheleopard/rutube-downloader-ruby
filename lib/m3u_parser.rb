@@ -81,7 +81,7 @@ class M3UParser
       if entry.has_key?(:url) then
         entry[:url]
       else
-        URI(base_url).merge(entry[:filename]).to_s
+        URI(base_url).merge(CGI.escape(entry[:filename])).to_s
       end
     }
   end

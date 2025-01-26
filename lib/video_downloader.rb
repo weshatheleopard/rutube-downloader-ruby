@@ -107,8 +107,8 @@ class VideoDownloader
       sftp.mkdir prefix
 
       if files.size > 1 then
-        files << generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url, extra_params)
-        files << generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), source_url, prefix)
+        files.unshift(generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url, extra_params))
+        files.unshift(generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), source_url, prefix))
       end
 
       print "Uploading... #{@save_pos}"
@@ -168,7 +168,8 @@ class VideoDownloader
       retry
     end
 
-    full_path = in_tmp_dir(newfile.filename, prefix)
+    fn = newfile.filename.to_s.split(%r{\%[0-9a-f][0-9a-f]}i).last
+    full_path = in_tmp_dir(fn, prefix)
     newfile.save_as(full_path)
     return full_path
   end
