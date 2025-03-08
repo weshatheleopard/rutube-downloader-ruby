@@ -1,10 +1,10 @@
 source 'https://rubygems.org'
-ruby '2.7.8'
+ruby '3.3.7'
 
 gem 'brotli'		# br encoding for Mechanize
 gem 'mechanize'
 gem 'net-sftp'          # Download files over SFTP
-gem 'ruby-terminfo'
+gem 'ruby-terminfo', git: 'https://github.com/genki/ruby-terminfo.git'
 gem 'term-ansicolor'
 
 group :development, :test do
