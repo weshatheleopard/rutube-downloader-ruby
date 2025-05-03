@@ -13,6 +13,7 @@ Currently supported:
   * [RuTube](https://rutube.ru/)
   * [Smotrim](https://smotrim.ru/)
   * [TV Zvezda](https://tvzvezda.ru/)
+  * [Wall Street Journal](https://www.wsj.com) [OLD only]
   
 Others can be added too through respective subclasses
   

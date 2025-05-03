@@ -44,7 +44,7 @@ class VideoDownloader
 
       break unless fn
 
-      print "#{@restore_pos}#{@erase_to_eol}#{segment_number.yellow}"
+      print "#{@restore_pos}#{@erase_to_eol}#{segment_number.to_s.yellow}"
       segments << fn
       segment_number += 1
     end
@@ -207,6 +207,7 @@ class VideoDownloader
 
   def agent
     @agent ||= Mechanize.new { |agent|
+      # agent.log = Logger.new(STDOUT)
       agent.user_agent_alias = self.class.const_get(:AGENT_ALIAS)
       agent.read_timeout = 5
     }
