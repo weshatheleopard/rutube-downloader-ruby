@@ -3,7 +3,7 @@ require_relative '../m3u_parser'
 
 class RutubeDownloader < VideoDownloader
   def self.can_download?(url)
-    return :stream if url =~ %r{rutube\.ru/.+\.ts}i
+    return :stream if url =~ %r{(?:rutube|rtbcdn)\.ru/.+\.ts}i
     return :page if url =~ %r{rutube\.ru/video/}i
     false
   end
