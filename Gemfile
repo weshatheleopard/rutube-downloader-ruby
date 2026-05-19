@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '3.3.7'
+ruby '3.3.10'
 
 gem 'brotli'		# br encoding for Mechanize
 gem 'mechanize'
@@ -8,6 +8,7 @@ gem 'ruby-terminfo', git: 'https://github.com/genki/ruby-terminfo.git'
 gem 'term-ansicolor'
 
 group :development, :test do
+  gem 'rake'
   gem 'rspec'
   gem 'assert_value'
 end

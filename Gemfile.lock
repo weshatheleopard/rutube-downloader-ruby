@@ -37,6 +37,7 @@ GEM
       logger
       mime-types-data (~> 3.2025, >= 3.2025.0507)
     mime-types-data (3.2026.0414)
+    mini_portile2 (2.8.9)
     mize (0.6.1)
     net-http-digest_auth (1.4.1)
     net-http-persistent (4.0.8)
@@ -45,6 +46,9 @@ GEM
       net-ssh (>= 5.0.0, < 8.0.0)
     net-ssh (7.3.2)
     nkf (0.2.0)
+    nokogiri (1.19.3)
+      mini_portile2 (~> 2.8.2)
+      racc (~> 1.4)
     nokogiri (1.19.3-aarch64-linux-gnu)
       racc (~> 1.4)
     nokogiri (1.19.3-aarch64-linux-musl)
@@ -63,6 +67,7 @@ GEM
       racc (~> 1.4)
     public_suffix (7.0.5)
     racc (1.8.1)
+    rake (13.4.2)
     readline (0.0.4)
       reline
     reline (0.6.3)
@@ -98,6 +103,7 @@ GEM
 PLATFORMS
   aarch64-linux-gnu
   aarch64-linux-musl
+  amd64-freebsd-15
   arm-linux-gnu
   arm-linux-musl
   arm64-darwin
@@ -110,13 +116,14 @@ DEPENDENCIES
   brotli
   mechanize
   net-sftp
+  rake
   rspec
   rspec_junit_formatter
   ruby-terminfo!
   term-ansicolor
 
 RUBY VERSION
-   ruby 3.3.7p123
+   ruby 3.3.10p183
 
 BUNDLED WITH
    2.6.8
