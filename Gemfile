@@ -8,6 +8,7 @@ gem 'ruby-terminfo', git: 'https://github.com/genki/ruby-terminfo.git'
 gem 'term-ansicolor'
 
 group :development, :test do
+  gem 'rake'
   gem 'rspec'
   gem 'assert_value'
 end
