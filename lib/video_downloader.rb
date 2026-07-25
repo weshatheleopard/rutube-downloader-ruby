@@ -27,7 +27,7 @@ class VideoDownloader
     false
   end
 
-  def download_video(source_url, start: 1, endno: nil, combine: false)
+  def download_video(source_url, start: 1, endno: nil, combine_segments: false)
     segment_number = start
     segments = []
 
@@ -35,7 +35,7 @@ class VideoDownloader
     prefix = match_data[:prefix]
     re = Regexp.new(segment_name(match_data[:number]))
 
-    print "Downloading... #{@save_pos}"
+    print 'Downloading... ', @save_pos
 
     loop do
       break if endno && segment_number > endno
@@ -44,17 +44,24 @@ class VideoDownloader
 
       break unless fn
 
-      print "#{@restore_pos}#{@erase_to_eol}#{segment_number.to_s.yellow}"
+      print @restore_pos, @erase_to_eol, segment_number.to_s.yellow
       segments << fn
       segment_number += 1
     end
 
     puts "#{@restore_pos}#{@erase_to_eol}#{'done.'.white.bold}"
 
-    if combine then
-      upload combine(segments, prefix), prefix, source_url
+    files = if combine_segments then
+      combine(segments, prefix)
     else
-      upload segments, prefix, source_url
+      segments <<
+        generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url) <<
+        generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), source_url, prefix)
+    end
+
+    if config('SFTP_SITE') then
+      upload files, prefix, source_url
+      cleanup files
     end
 
     true
@@ -100,32 +107,35 @@ class VideoDownloader
     return full_path
   end
 
-  def upload(files, prefix, source_url, extra_params = {})
+  def upload(files, prefix, source_url)
     Net::SFTP.start(config('SFTP_SITE'), config('SFTP_USER'),
                      { :port => config('SFTP_PORT'), :password => config('SFTP_PASSWORD'),
                        :non_interactive => true }) { |sftp|
-      sftp.mkdir prefix
+      sftp.mkdir(prefix)
 
-      if files.size > 1 then
-        files.unshift(generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url, extra_params))
-        files.unshift(generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), source_url, prefix))
-      end
-
-      print "Uploading... #{@save_pos}"
+      print 'Uploading... ', @save_pos
 
       files.each_with_index do |fn, idx|
         sftp.upload!(fn, "#{prefix}/#{File.basename(fn)}")
-        File.delete(fn)
-        print "#{@restore_pos}#{@erase_to_eol} #{File.basename(fn).white.bold} (#{(idx + 1).to_s.yellow}/#{files.count.to_s.yellow})"
+        print @restore_pos, @erase_to_eol, File.basename(fn).white.bold, " (#{(idx + 1).to_s.yellow}/#{files.count.to_s.yellow})"
       end
-
-      FileUtils.rmdir(tmp_dir_name(prefix))
-
-      puts "#{@restore_pos}#{@erase_to_eol}#{'done.'.white.bold}"
     }
   end
 
-  def generate_segment_list(list_path, arr, source_url, extra_params = {})
+  def cleanup(files)
+    print 'Cleaning up... ', @save_pos
+
+    files.each_with_index do |fn, idx|
+      File.delete(fn)
+      print @restore_pos, @erase_to_eol, File.basename(fn).white.bold, " (#{(idx + 1).to_s.red}/#{files.count.to_s.red})"
+    end
+
+    FileUtils.rmdir(tmp_dir_name(prefix))
+
+    puts "#{@restore_pos}#{@erase_to_eol}#{'done.'.white.bold}"
+  end
+
+  def generate_segment_list(list_path, arr, source_url, extra_params: {})
     File.open(list_path, 'w') { |f|
       f.puts "# Segment list for #{source_url}"
 
@@ -164,7 +174,7 @@ class VideoDownloader
       else retry
       end
     rescue Mechanize::ResponseReadError => e
-      print "  #{e.message.red.bold}"
+      print '  ', e.message.red.bold
       retry
     end
 
@@ -174,7 +184,7 @@ class VideoDownloader
     return full_path
   end
 
-  def download_video_by_url(source_url, combine: false)
+  def download_video_by_url(source_url, combine_segments: false)
     segments = []
 
     puts "Obtaining track list from #{source_url.white.bold}"
@@ -188,18 +198,25 @@ class VideoDownloader
       puts "Video #{v}: #{data[k].white.bold}" if data&.has_key?(k)
     }
 
-    print "Downloading segments... #{@save_pos}"
+    print 'Downloading segments... ', @save_pos
 
     urls.each_with_index { |url, idx|
-      print "#{@restore_pos}#{@erase_to_eol}#{File.basename(url).white.bold} (#{(idx + 1).to_s.yellow}/#{urls.count.to_s.yellow})"
+      print @restore_pos, @erase_to_eol, File.basename(url).white.bold, "(#{(idx + 1).to_s.yellow}/#{urls.count.to_s.yellow})"
       segments << get_segment_by_url(url, prefix)
     }
     puts "#{@restore_pos}#{@erase_to_eol}#{'done'.white.bold}."
 
-    if combine then
-      upload combine(segments, prefix), prefix, source_url, data
+    files = if combine_segments then
+      combine(segments, prefix)
     else
-      upload segments, prefix, source_url, data
+      segments <<
+        generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url, extra_params: data) <<
+        generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), source_url, prefix)
+    end
+
+    if config('SFTP_SITE') then
+      upload(files, prefix, source_url)
+      cleanup(files)
     end
 
     true
