@@ -49,13 +49,13 @@ class VideoDownloader
       segment_number += 1
     end
 
-    puts "#{@restore_pos}#{@erase_to_eol}#{'done.'.white.bold}"
+    print @restore_pos, @erase_to_eol, "done.\n".white.bold
 
     files = if combine_segments then
       combine(segments, prefix)
     else
       segments <<
-        generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url) <<
+        generate_segment_list(in_tmp_dir('_list.txt', prefix), segments, source_url) <<
         generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), source_url, prefix)
     end
 
@@ -201,16 +201,16 @@ class VideoDownloader
     print 'Downloading segments... ', @save_pos
 
     urls.each_with_index { |url, idx|
-      print @restore_pos, @erase_to_eol, File.basename(url).white.bold, "(#{(idx + 1).to_s.yellow}/#{urls.count.to_s.yellow})"
+      print @restore_pos, @erase_to_eol, File.basename(url).white.bold, " (#{(idx + 1).to_s.yellow}/#{urls.count.to_s.yellow})"
       segments << get_segment_by_url(url, prefix)
     }
-    puts "#{@restore_pos}#{@erase_to_eol}#{'done'.white.bold}."
+    print @restore_pos, @erase_to_eol, "done\n".white.bold
 
     files = if combine_segments then
       combine(segments, prefix)
     else
       segments <<
-        generate_segment_list(in_tmp_dir('_list.txt', prefix), files, source_url, extra_params: data) <<
+        generate_segment_list(in_tmp_dir('_list.txt', prefix), segments, source_url, extra_params: data) <<
         generate_batch_file(in_tmp_dir("_#{prefix}.bat", prefix), source_url, prefix)
     end
 
