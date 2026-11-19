@@ -223,7 +223,7 @@ CHECKSUMS
   webrobots (0.1.3) sha256=2e7b96e363bf6a5f700632bc84f260dd521a6c9b26f24f26905b7c71aeb1f8d7
 
 RUBY VERSION
-  ruby 3.3.10
+  ruby 3.4.9
 
 BUNDLED WITH
   4.1.0

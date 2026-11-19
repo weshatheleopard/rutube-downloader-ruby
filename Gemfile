@@ -1,5 +1,5 @@
 source 'https://rubygems.org'
-ruby '3.3.10'
+ruby '3.4.9'
 
 gem 'brotli'		# br encoding for Mechanize
 gem 'mechanize'
