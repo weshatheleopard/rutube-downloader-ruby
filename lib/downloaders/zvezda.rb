@@ -25,7 +25,8 @@ class ZvezdaDownloader < VideoDownloader
     if md.nil? then # Older player
       md = page.content.match(%r{<script>self\.__next_f\.push\((?<json>\[1,"\d+:([^<]+?urlApiPlaylist[^<]+?)\\n"\])\)<\/script>})
       js1 = JSON.parse(md[:json])
-      hsh = JSON::parse(js1.last[3...-1]).dig(0, 0, 3, 'children', 0, 0, 3, 'data', 'items', 0)
+      js2 = JSON::parse(js1.last[3...-1])
+      hsh = js2.dig(0, 0, 0, 3, 'children', 0, 0, 3, 'data', 'items', 0)
       m3u_url = hsh.dig('media', 'video', 'url')
       title = hsh['title']
       created = hsh['dateCreate']
