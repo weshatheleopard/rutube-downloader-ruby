@@ -65,6 +65,8 @@ class M3UParser
           @m3u['ID3-EQUIV-TDTG'] = md[:params] if md
         when /^(?!#)http.+/ then
           params_hash[:url] = line
+        when /^#EXT-X-INDEPENDENT-SEGMENTS/ then
+          # nop
         when /^(?!#).+/ then
           params_hash[:filename] = line
         else
