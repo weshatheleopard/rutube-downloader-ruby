@@ -60,8 +60,8 @@ class VideoDownloader
     end
 
     if config('SFTP_SITE') then
-      upload files, prefix, source_url
-      cleanup files
+      upload(files, prefix, source_url)
+      cleanup(files, prefix)
     end
 
     true
@@ -119,10 +119,12 @@ class VideoDownloader
         sftp.upload!(fn, "#{prefix}/#{File.basename(fn)}")
         print @restore_pos, @erase_to_eol, File.basename(fn).white.bold, " (#{(idx + 1).to_s.yellow}/#{files.count.to_s.yellow})"
       end
+
+      print @restore_pos, @erase_to_eol, "done.\n".white.bold
     }
   end
 
-  def cleanup(files)
+  def cleanup(files, prefix)
     print 'Cleaning up... ', @save_pos
 
     files.each_with_index do |fn, idx|
@@ -216,7 +218,7 @@ class VideoDownloader
 
     if config('SFTP_SITE') then
       upload(files, prefix, source_url)
-      cleanup(files)
+      cleanup(files, prefix)
     end
 
     true
